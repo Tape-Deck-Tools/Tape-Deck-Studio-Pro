@@ -392,7 +392,7 @@
     <!-- Application Script Logic -->
     <script>
         let state = {
-            sideCapacitySeconds: 30 * 60,
+            sideCapacitySeconds: 30 * 60, // Default C-60 (30 mins per side)
             gapSeconds: 2.0,
             speedPercent: -5.75,
             dspProfile: 'modern',
@@ -706,6 +706,7 @@
             updateUI();
         });
 
+        // FIXED CAPACITY BUTTON LOGIC
         document.querySelectorAll('.tape-len-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tape-len-btn').forEach(b => {
@@ -715,19 +716,21 @@
                 btn.classList.remove('border-stone-700', 'bg-stone-800', 'text-stone-300');
                 btn.classList.add('border-amber-500', 'bg-amber-500/20', 'text-amber-400');
 
-                const mins = parseFloat(btn.dataset.mins);
-                state.sideCapacitySeconds = mins * 60;
-                document.getElementById('tape-type-label').textContent = (mins * 2).toString();
-                document.getElementById('custom-side-mins').value = mins;
+                const totalMins = parseFloat(btn.dataset.mins); // e.g. 60 for C-60
+                const sideMins = totalMins / 2; // 30 minutes per side
+                state.sideCapacitySeconds = sideMins * 60;
+                
+                document.getElementById('tape-type-label').textContent = totalMins.toString();
+                document.getElementById('custom-side-mins').value = sideMins;
                 updateUI();
             });
         });
 
         document.getElementById('custom-side-mins').addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            if (!isNaN(val) && val > 0) {
-                state.sideCapacitySeconds = val * 60;
-                document.getElementById('tape-type-label').textContent = Math.round(val * 2).toString();
+            const sideMins = parseFloat(e.target.value);
+            if (!isNaN(sideMins) && sideMins > 0) {
+                state.sideCapacitySeconds = sideMins * 60;
+                document.getElementById('tape-type-label').textContent = Math.round(sideMins * 2).toString();
                 updateUI();
             }
         });
@@ -984,14 +987,12 @@
             draw();
         }
 
-        // Export Engine with Tape Formulation & DSP Profile Stitching
         document.getElementById('btn-export-side-a').addEventListener('click', () => exportSideWav('A'));
         document.getElementById('btn-export-side-b').addEventListener('click', () => exportSideWav('B'));
 
         function setupAudioPipeline(offlineCtx) {
             let entryNode = null, exitNode = null, profilePrefix = "STANDARD";
 
-            // 1. DSP Pre-Emphasis Profile
             switch (state.dspProfile) {
                 case 'modern':
                     profilePrefix = "MODERN";
@@ -1021,14 +1022,12 @@
                     break;
             }
 
-            // 2. Tape Formulation Bias & Equalization Compensation Stage
             const formulationFilter = offlineCtx.createBiquadFilter();
             const formulationGain = offlineCtx.createGain();
             let formulationTag = "TYPE1";
 
             switch (state.tapeFormulation) {
                 case 'type2':
-                    // Type II (Chrome/Cobalt): 70µs EQ characteristic — slight high-end lift & tighter headroom
                     formulationTag = "TYPE2-CHROME";
                     formulationFilter.type = 'highshelf';
                     formulationFilter.frequency.value = 7000;
@@ -1036,15 +1035,13 @@
                     formulationGain.gain.value = 0.95;
                     break;
                 case 'type4':
-                    // Type IV (Metal): Maximum headroom, ultra-wide linear frequency response
                     formulationTag = "TYPE4-METAL";
                     formulationFilter.type = 'highshelf';
                     formulationFilter.frequency.value = 10000;
                     formulationFilter.gain.value = 1.0;
-                    formulationGain.gain.value = 0.90; // extra headroom padding for massive metal saturation
+                    formulationGain.gain.value = 0.90;
                     break;
                 default:
-                    // Type I (Normal/Ferric): 120µs standard ferric roll-off compensation
                     formulationTag = "TYPE1-FERRIC";
                     formulationFilter.type = 'highshelf';
                     formulationFilter.frequency.value = 4000;
@@ -1092,7 +1089,6 @@
                 const offlineCtx = new OfflineAudioContext(2, Math.max(1, Math.ceil(totalRenderDuration * nativeSampleRate)), nativeSampleRate);
                 const { entryNode, exitNode, fullPrefix } = setupAudioPipeline(offlineCtx);
 
-                // Universal Limiter tailored to tape saturation threshold
                 const limiter = offlineCtx.createDynamicsCompressor();
                 limiter.threshold.value = state.tapeFormulation === 'type4' ? -1.0 : -0.5;
                 limiter.knee.value = 0;
