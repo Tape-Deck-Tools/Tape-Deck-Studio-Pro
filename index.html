@@ -39,7 +39,6 @@
         .mono {
             font-family: 'JetBrains Mono', monospace;
         }
-        /* Reel Rotation Animation */
         @keyframes spin-slow {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -51,8 +50,6 @@
             opacity: 0.55;
             cursor: wait;
         }
-
-        /* Custom Touch-Friendly Scrollbars */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -120,7 +117,6 @@
 
                 <!-- Cassette Shell Canvas/Graphic -->
                 <div class="relative bg-stone-950 border-2 border-stone-800 rounded-lg p-3 sm:p-4 flex flex-col items-center justify-between shadow-inner h-52 sm:h-56">
-                    <!-- Cassette Top Label -->
                     <div class="w-full bg-amber-100/90 text-stone-900 p-2 rounded flex justify-between items-center shadow-sm text-xs font-bold mb-2">
                         <div class="flex items-center space-x-2 truncate pr-1">
                             <span class="bg-stone-900 text-amber-400 px-1.5 py-0.5 rounded text-[10px] sm:text-xs flex-shrink-0" id="active-side-badge">SIDE A</span>
@@ -131,34 +127,26 @@
                         </div>
                     </div>
 
-                    <!-- Reels & Window -->
                     <div class="relative w-full h-24 sm:h-28 bg-stone-900/90 border border-stone-800 rounded-md p-2 flex items-center justify-around overflow-hidden">
-                        <!-- Magnetic Tape Window Overlay -->
                         <div class="absolute inset-x-6 sm:inset-x-8 top-3 bottom-3 bg-amber-950/20 rounded-full border border-amber-900/30 flex items-center justify-between px-4 sm:px-6 pointer-events-none">
-                            <!-- Left Reel Spool -->
                             <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
                                 <div id="left-reel-hub" class="w-8 h-8 sm:w-10 sm:h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
                                     <div class="w-2 h-2 bg-stone-400 rounded-full"></div>
                                 </div>
                             </div>
-                            <!-- Right Reel Spool -->
                             <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
                                 <div id="right-reel-hub" class="w-8 h-8 sm:w-10 sm:h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
                                     <div class="w-2 h-2 bg-stone-400 rounded-full"></div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Realtime Audio Waveform Visualizer Canvas -->
                         <canvas id="deck-visualizer" class="w-full h-full opacity-60 z-10 pointer-events-none"></canvas>
                     </div>
 
-                    <!-- Digital Time Counter & Controls -->
                     <div class="w-full flex items-center justify-between mt-3 pt-2 border-t border-stone-800/80">
                         <div class="font-mono text-base sm:text-xl text-amber-500 tracking-wider font-bold bg-black/60 px-2.5 sm:px-3 py-1 rounded border border-amber-500/20" id="deck-timer">
                             00:00.0
                         </div>
-
                         <div class="flex items-center space-x-1.5 sm:space-x-2">
                             <button id="btn-prev" class="p-2 sm:px-3 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-xs sm:text-sm active:scale-95" aria-label="Previous track">
                                 <i class="fa-solid fa-backward-step"></i>
@@ -174,7 +162,7 @@
                 </div>
             </div>
 
-            <!-- Tape Capacity & Hardware Speed Calibration Controls -->
+            <!-- Tape Capacity, Formulation & Speed Calibration Controls -->
             <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 sm:p-5 space-y-4 sm:space-y-5">
                 <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center">
                     <i class="fa-solid fa-sliders mr-2"></i> Tape Deck & Capacity Settings
@@ -202,6 +190,19 @@
                         <span id="gap-val-display" class="text-xs font-mono text-amber-400">2.0s</span>
                     </div>
                     <input type="range" id="gap-slider" min="0" max="10" step="0.5" value="2.0" class="w-full accent-amber-500 bg-stone-800 rounded py-1">
+                </div>
+
+                <!-- Tape Formulation / Bias Type Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-amber-300 mb-1 flex items-center">
+                        <i class="fa-solid fa-compact-disc mr-1.5 text-amber-500"></i>
+                        Tape Formulation / Bias Type
+                    </label>
+                    <select id="tape-formulation-select" class="w-full p-2.5 rounded text-xs font-mono bg-stone-950 text-amber-400 border border-stone-700 focus:outline-none focus:border-amber-500">
+                        <option value="type1">Type I (Normal / Ferric) — Standard EQ, 120µs (Rolls off highs early)</option>
+                        <option value="type2">Type II (High / Chrome / Cobalt) — 70µs EQ, Enhanced Highs</option>
+                        <option value="type4">Type IV (Metal) — Maximum Headroom & Dynamic Range</option>
+                    </select>
                 </div>
 
                 <!-- DSP Pre-Emphasis Encoding Profile Selector -->
@@ -235,7 +236,6 @@
                         Compensates for motor speed drift. Alters playback and export duration/pitch.
                     </p>
 
-                    <!-- Speed Preset Buttons -->
                     <div class="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3">
                         <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" data-speed="0">0% (1.0x)</button>
                         <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-amber-500 bg-amber-500/20 text-amber-400 font-bold active:scale-95" data-speed="-5.75">-5.75%</button>
@@ -245,7 +245,6 @@
                         <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" id="btn-custom-speed">Custom</button>
                     </div>
 
-                    <!-- Custom Speed Offset (numeric input) -->
                     <div id="custom-speed-container" class="space-y-1">
                         <div class="flex justify-between text-xs font-mono text-stone-400">
                             <label for="speed-input">Speed Offset (-15% to +15%):</label>
@@ -277,7 +276,7 @@
                         </button>
                     </div>
                     <p class="text-[10px] text-center text-stone-500 mt-2">
-                        Applies selected DSP pre-emphasis, safety brickwall limiter, and calibrated speed.
+                        Applies tape formulation bias curve, DSP pre-emphasis, safety limiter, and calibrated speed.
                     </p>
                 </div>
             </div>
@@ -286,7 +285,6 @@
         <!-- Right Panel: Tape Layout Optimizer & Track Allocation -->
         <div class="lg:col-span-7 space-y-5 sm:space-y-6">
 
-            <!-- Toolbar & Auto-Fit Action -->
             <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 class="font-bold text-stone-200 text-xs sm:text-sm">Layout Auto-Fitting</h2>
@@ -308,7 +306,6 @@
                 <!-- SIDE A BOX -->
                 <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-col justify-between" id="side-a-container">
                     <div>
-                        <!-- Header & Capacity Meter -->
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center space-x-2">
                                 <span class="px-2 py-0.5 bg-amber-500 text-stone-950 font-extrabold text-[11px] rounded">SIDE A</span>
@@ -317,20 +314,17 @@
                             <span class="text-xs font-mono font-bold text-amber-400" id="side-a-time-text">00:00 / 30:00</span>
                         </div>
 
-                        <!-- Progress Bar -->
                         <div class="w-full h-2.5 bg-stone-950 rounded-full overflow-hidden border border-stone-800 mb-3">
                             <div id="side-a-bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%;"></div>
                         </div>
 
-                        <!-- Track Drop Area -->
                         <div id="side-a-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
-                            <div class="text-center py-8 text-stone-600 text-xs empty-prompt">
+                            <div class="text-center py-6 text-stone-600 text-xs empty-prompt">
                                 Drop or assign tracks for Side A
                             </div>
                         </div>
                     </div>
 
-                    <!-- Remaining / Silence Pad Indicator -->
                     <div class="mt-3 pt-2 border-t border-stone-800 flex justify-between text-[11px] font-mono">
                         <span class="text-stone-400">Remaining Leader Pad:</span>
                         <span id="side-a-remaining" class="text-amber-400">30:00</span>
@@ -340,7 +334,6 @@
                 <!-- SIDE B BOX -->
                 <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-col justify-between" id="side-b-container">
                     <div>
-                        <!-- Header & Capacity Meter -->
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center space-x-2">
                                 <span class="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-300 font-extrabold text-[11px] rounded">SIDE B</span>
@@ -349,20 +342,17 @@
                             <span class="text-xs font-mono font-bold text-amber-400" id="side-b-time-text">00:00 / 30:00</span>
                         </div>
 
-                        <!-- Progress Bar -->
                         <div class="w-full h-2.5 bg-stone-950 rounded-full overflow-hidden border border-stone-800 mb-3">
                             <div id="side-b-bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%;"></div>
                         </div>
 
-                        <!-- Track Drop Area -->
                         <div id="side-b-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
-                            <div class="text-center py-8 text-stone-600 text-xs empty-prompt">
+                            <div class="text-center py-6 text-stone-600 text-xs empty-prompt">
                                 Drop or assign tracks for Side B
                             </div>
                         </div>
                     </div>
 
-                    <!-- Remaining / Silence Pad Indicator -->
                     <div class="mt-3 pt-2 border-t border-stone-800 flex justify-between text-[11px] font-mono">
                         <span class="text-stone-400">Remaining Leader Pad:</span>
                         <span id="side-b-remaining" class="text-amber-400">30:00</span>
@@ -371,7 +361,7 @@
 
             </div>
 
-            <!-- Unassigned Pool / Uploaded Tracks Queue -->
+            <!-- Unassigned Pool -->
             <div class="bg-stone-900 border border-stone-800 rounded-xl p-4">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-2">
@@ -401,32 +391,31 @@
 
     <!-- Application Script Logic -->
     <script>
-        // State Management
         let state = {
-            sideCapacitySeconds: 30 * 60, // 30 mins per side (C-60 standard)
+            sideCapacitySeconds: 30 * 60,
             gapSeconds: 2.0,
-            speedPercent: -5.75, // Default playback rate modifier (-5.75%)
-            dspProfile: 'modern', // Default DSP pre-emphasis profile
-            tracks: [], // { id, name, duration (original exact sec), buffer, side: 'pool'|'A'|'B' }
+            speedPercent: -5.75,
+            dspProfile: 'modern',
+            tapeFormulation: 'type1',
+            tracks: [],
             activeSide: 'A',
             playingIndex: -1,
             isPlaying: false
         };
 
-        // Web Audio API Context & Nodes
         let audioCtx = null;
         let currentSourceNode = null;
         let analyserNode = null;
         let playStartTime = 0;
         let animFrameId = null;
 
-        // DOM Elements
         const audioInput = document.getElementById('audio-input');
         const fileDropzone = document.getElementById('file-dropzone');
         const dropzoneFileInput = document.getElementById('dropzone-file-input');
         const gapSlider = document.getElementById('gap-slider');
         const gapValDisplay = document.getElementById('gap-val-display');
         const dspProfileSelect = document.getElementById('dsp-profile-select');
+        const tapeFormulationSelect = document.getElementById('tape-formulation-select');
         const speedInput = document.getElementById('speed-input');
         const speedInputMsg = document.getElementById('speed-input-msg');
         const speedStepDown = document.getElementById('speed-step-down');
@@ -447,7 +436,6 @@
         const deckStatusLabel = document.getElementById('deck-status-label');
         const recIndicator = document.getElementById('rec-indicator');
 
-        // Initialize Web Audio Context
         function initAudioContext() {
             if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -460,7 +448,6 @@
             }
         }
 
-        // Format Seconds to MM:SS.s
         function formatTime(sec) {
             if (isNaN(sec) || sec < 0) sec = 0;
             const m = Math.floor(sec / 60);
@@ -469,7 +456,6 @@
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms}`;
         }
 
-        // Calculate exact original total duration for a given list of tracks (including gaps)
         function calculateSideDuration(trackList) {
             if (trackList.length === 0) return 0;
             const trackSum = trackList.reduce((acc, t) => acc + t.duration, 0);
@@ -477,7 +463,6 @@
             return trackSum + gapsSum;
         }
 
-        // Helper Toast Notification
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').textContent = msg;
@@ -489,7 +474,6 @@
             }, 3000);
         }
 
-        // UI Update: Capacity Meters, List Renderings, Progress Bars
         function updateUI() {
             const sideATracks = state.tracks.filter(t => t.side === 'A');
             const sideBTracks = state.tracks.filter(t => t.side === 'B');
@@ -499,7 +483,6 @@
             const durB = calculateSideDuration(sideBTracks);
             const cap = state.sideCapacitySeconds;
 
-            // Side A Stats
             const barA = document.getElementById('side-a-bar');
             const pctA = Math.min(100, (durA / cap) * 100);
             barA.style.width = `${pctA}%`;
@@ -508,7 +491,6 @@
             document.getElementById('side-a-track-count').textContent = `${sideATracks.length} trk${sideATracks.length === 1 ? '' : 's'}`;
             document.getElementById('side-a-remaining').textContent = durA > cap ? `OVER +${formatTime(durA - cap)}` : formatTime(cap - durA);
 
-            // Side B Stats
             const barB = document.getElementById('side-b-bar');
             const pctB = Math.min(100, (durB / cap) * 100);
             barB.style.width = `${pctB}%`;
@@ -517,20 +499,16 @@
             document.getElementById('side-b-track-count').textContent = `${sideBTracks.length} trk${sideBTracks.length === 1 ? '' : 's'}`;
             document.getElementById('side-b-remaining').textContent = durB > cap ? `OVER +${formatTime(durB - cap)}` : formatTime(cap - durB);
 
-            // Pool Count
             document.getElementById('pool-count').textContent = poolTracks.length;
 
-            // Render Track Cards
             renderTrackList(sideAList, sideATracks, 'A');
             renderTrackList(sideBList, sideBTracks, 'B');
             renderTrackList(poolList, poolTracks, 'pool');
 
-            // Update Speed Indicator Text
             const rate = 1 + (state.speedPercent / 100);
             speedIndicatorBadge.textContent = `${state.speedPercent >= 0 ? '+' : ''}${state.speedPercent.toFixed(2)}% (${rate.toFixed(3)}x)`;
         }
 
-        // Render Track Items inside containers
         function renderTrackList(container, trackList, sideKey) {
             container.innerHTML = '';
             if (trackList.length === 0) {
@@ -551,7 +529,6 @@
                 item.draggable = true;
                 item.dataset.trackId = track.id;
 
-                // Drag & Drop Listeners
                 item.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('text/plain', track.id);
                 });
@@ -581,7 +558,6 @@
                     </div>
                 `;
 
-                // Handle single track preview
                 item.querySelector('.play-single-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (state.isPlaying && state.activeSide === sideKey && state.playingIndex === idx) {
@@ -625,7 +601,6 @@
             });
         }
 
-        // File Audio Upload & Decoder
         async function processAudioFiles(files) {
             initAudioContext();
             const validFiles = Array.from(files).filter(f => f.type.startsWith('audio/') || /\.(mp3|wav|flac|ogg|m4a|aac|webm)$/i.test(f.name));
@@ -658,7 +633,6 @@
         audioInput.addEventListener('change', (e) => processAudioFiles(e.target.files));
         dropzoneFileInput.addEventListener('change', (e) => processAudioFiles(e.target.files));
 
-        // Drag and Drop Listeners
         ['dragenter', 'dragover'].forEach(eventName => {
             fileDropzone.addEventListener(eventName, (e) => {
                 e.preventDefault();
@@ -678,7 +652,6 @@
             if (files && files.length > 0) processAudioFiles(files);
         });
 
-        // Drop zone mapping across lists
         [
             { el: sideAList, side: 'A' },
             { el: sideBList, side: 'B' },
@@ -696,7 +669,6 @@
             });
         });
 
-        // Auto-Fit Bin Packing Algorithm
         document.getElementById('btn-autofit').addEventListener('click', () => {
             if (state.tracks.length === 0) {
                 showToast("Please add tracks first.");
@@ -728,14 +700,12 @@
             showToast("Auto-fitted tracks into Side A & B!");
         });
 
-        // Clear All
         document.getElementById('btn-clear-all').addEventListener('click', () => {
             if (state.isPlaying) stopPlayback();
             state.tracks = [];
             updateUI();
         });
 
-        // Capacity Buttons
         document.querySelectorAll('.tape-len-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tape-len-btn').forEach(b => {
@@ -772,7 +742,10 @@
             state.dspProfile = e.target.value;
         });
 
-        // Speed Offset Logic
+        tapeFormulationSelect.addEventListener('change', (e) => {
+            state.tapeFormulation = e.target.value;
+        });
+
         const SPEED_MIN = -15;
         const SPEED_MAX = 15;
         const DEFAULT_SPEED_PERCENT = state.speedPercent;
@@ -894,7 +867,6 @@
         highlightSpeedButtons();
         updateSpeedRateLabel();
 
-        // Live Playback Engine
         function playTrackAtIndex(index) {
             initAudioContext();
             const sideTracks = state.tracks.filter(t => t.side === state.activeSide);
@@ -1012,16 +984,17 @@
             draw();
         }
 
-        // Export Engine
+        // Export Engine with Tape Formulation & DSP Profile Stitching
         document.getElementById('btn-export-side-a').addEventListener('click', () => exportSideWav('A'));
         document.getElementById('btn-export-side-b').addEventListener('click', () => exportSideWav('B'));
 
-        function setupDspProfile(offlineCtx) {
+        function setupAudioPipeline(offlineCtx) {
             let entryNode = null, exitNode = null, profilePrefix = "STANDARD";
 
+            // 1. DSP Pre-Emphasis Profile
             switch (state.dspProfile) {
                 case 'modern':
-                    profilePrefix = "MODERN-BUDGET";
+                    profilePrefix = "MODERN";
                     const f1 = offlineCtx.createBiquadFilter();
                     f1.type = 'highshelf'; f1.frequency.value = 5000; f1.gain.value = 4.5;
                     const g1 = offlineCtx.createGain(); g1.gain.value = 1.4;
@@ -1047,7 +1020,43 @@
                     entryNode = g0; exitNode = g0;
                     break;
             }
-            return { entryNode, exitNode, profilePrefix };
+
+            // 2. Tape Formulation Bias & Equalization Compensation Stage
+            const formulationFilter = offlineCtx.createBiquadFilter();
+            const formulationGain = offlineCtx.createGain();
+            let formulationTag = "TYPE1";
+
+            switch (state.tapeFormulation) {
+                case 'type2':
+                    // Type II (Chrome/Cobalt): 70µs EQ characteristic — slight high-end lift & tighter headroom
+                    formulationTag = "TYPE2-CHROME";
+                    formulationFilter.type = 'highshelf';
+                    formulationFilter.frequency.value = 7000;
+                    formulationFilter.gain.value = 2.0;
+                    formulationGain.gain.value = 0.95;
+                    break;
+                case 'type4':
+                    // Type IV (Metal): Maximum headroom, ultra-wide linear frequency response
+                    formulationTag = "TYPE4-METAL";
+                    formulationFilter.type = 'highshelf';
+                    formulationFilter.frequency.value = 10000;
+                    formulationFilter.gain.value = 1.0;
+                    formulationGain.gain.value = 0.90; // extra headroom padding for massive metal saturation
+                    break;
+                default:
+                    // Type I (Normal/Ferric): 120µs standard ferric roll-off compensation
+                    formulationTag = "TYPE1-FERRIC";
+                    formulationFilter.type = 'highshelf';
+                    formulationFilter.frequency.value = 4000;
+                    formulationFilter.gain.value = 3.0;
+                    formulationGain.gain.value = 1.0;
+                    break;
+            }
+
+            exitNode.connect(formulationFilter);
+            formulationFilter.connect(formulationGain);
+
+            return { entryNode, exitNode: formulationGain, fullPrefix: `${profilePrefix}_${formulationTag}` };
         }
 
         async function exportSideWav(side) {
@@ -1061,7 +1070,7 @@
             const exportButtons = [document.getElementById('btn-export-side-a'), document.getElementById('btn-export-side-b')];
             exportButtons.forEach(b => b.disabled = true);
 
-            showToast(`Rendering Side ${side} WAV (${state.dspProfile.toUpperCase()})...`);
+            showToast(`Rendering Side ${side} WAV (${state.dspProfile.toUpperCase()}, ${state.tapeFormulation.toUpperCase()})...`);
 
             const rate = Math.max(0.1, 1 + (state.speedPercent / 100));
             const nativeSampleRate = activeTracks[0].buffer.sampleRate || 44100;
@@ -1081,11 +1090,15 @@
 
             try {
                 const offlineCtx = new OfflineAudioContext(2, Math.max(1, Math.ceil(totalRenderDuration * nativeSampleRate)), nativeSampleRate);
-                const { entryNode, exitNode, profilePrefix } = setupDspProfile(offlineCtx);
+                const { entryNode, exitNode, fullPrefix } = setupAudioPipeline(offlineCtx);
 
+                // Universal Limiter tailored to tape saturation threshold
                 const limiter = offlineCtx.createDynamicsCompressor();
-                limiter.threshold.value = -0.5; limiter.knee.value = 0; limiter.ratio.value = 20;
-                limiter.attack.value = 0.003; limiter.release.value = 0.05;
+                limiter.threshold.value = state.tapeFormulation === 'type4' ? -1.0 : -0.5;
+                limiter.knee.value = 0;
+                limiter.ratio.value = 20;
+                limiter.attack.value = 0.003;
+                limiter.release.value = 0.05;
 
                 exitNode.connect(limiter);
                 limiter.connect(offlineCtx.destination);
@@ -1105,7 +1118,7 @@
 
                 const speedSign = state.speedPercent >= 0 ? '+' : '';
                 a.href = url;
-                a.download = `${profilePrefix}_Ready_Side_${side}_${speedSign}${state.speedPercent.toFixed(2)}pct.wav`;
+                a.download = `${fullPrefix}_Side_${side}_${speedSign}${state.speedPercent.toFixed(2)}pct.wav`;
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
