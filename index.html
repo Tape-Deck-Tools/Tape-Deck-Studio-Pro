@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cassette Tape Layout & Speed Optimizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TapeDeck Studio Pro - Cassette Layout & Speed Optimizer</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -34,6 +34,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #0c0a09;
             color: #f5f5f4;
+            -webkit-tap-highlight-color: transparent;
         }
         .mono {
             font-family: 'JetBrains Mono', monospace;
@@ -46,18 +47,15 @@
         .spinning {
             animation: spin-slow 3s linear infinite;
         }
-        .spinning-fast {
-            animation: spin-slow 1s linear infinite;
-        }
         button:disabled {
             opacity: 0.55;
             cursor: wait;
         }
 
-        /* Custom Scrollbars */
+        /* Custom Touch-Friendly Scrollbars */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: #1c1917;
@@ -66,29 +64,26 @@
             background: #44403c;
             border-radius: 3px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #78716c;
-        }
     </style>
 </head>
 <body class="min-h-screen bg-stone-950 text-stone-100 flex flex-col">
 
     <!-- Header -->
     <header class="bg-stone-900 border-b border-stone-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 id-header-inner flex items-center justify-between h-16">
-            <div class="flex items-center space-x-3">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <div class="flex items-center space-x-2.5">
                 <div class="p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500">
-                    <i class="fa-solid fa-tape text-xl"></i>
+                    <i class="fa-solid fa-tape text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg text-amber-400 tracking-wide">TapeDeck Studio Pro</h1>
-                    <p class="text-xs text-stone-400">Exact Layout Optimizer & Calibration Master</p>
+                    <h1 class="font-bold text-sm sm:text-base md:text-lg text-amber-400 tracking-wide">TapeDeck Studio Pro</h1>
+                    <p class="text-[10px] sm:text-xs text-stone-400">Analog Calibration & Optimizer</p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-3">
-                <label class="cursor-pointer bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center shadow-lg shadow-amber-600/20">
-                    <i class="fa-solid fa-plus mr-2"></i> Add Audio Tracks
+            <div class="flex items-center space-x-2">
+                <label class="cursor-pointer bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center shadow-lg shadow-amber-600/20 active:scale-95">
+                    <i class="fa-solid fa-plus mr-1.5"></i> <span class="hidden xs:inline">Add Tracks</span><span class="inline xs:hidden">Add</span>
                     <input type="file" id="audio-input" multiple accept="audio/*" class="hidden">
                 </label>
             </div>
@@ -96,59 +91,59 @@
     </header>
 
     <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
 
         <!-- Left / Top Panel: Tape Configuration & Virtual Cassette Deck -->
-        <div class="lg:col-span-5 flex flex-col space-y-6">
+        <div class="lg:col-span-5 flex flex-col space-y-5 sm:space-y-6">
 
             <!-- Dropzone Area for Drag & Drop Audio File Import -->
-            <div id="file-dropzone" class="border-2 border-dashed border-stone-700 hover:border-amber-500 bg-stone-900/60 hover:bg-stone-900/90 transition-all rounded-xl p-5 text-center cursor-pointer flex flex-col items-center justify-center relative group">
+            <div id="file-dropzone" class="border-2 border-dashed border-stone-700 hover:border-amber-500 bg-stone-900/60 hover:bg-stone-900/90 transition-all rounded-xl p-4 sm:p-5 text-center cursor-pointer flex flex-col items-center justify-center relative group">
                 <input type="file" id="dropzone-file-input" multiple accept="audio/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
                 <div class="p-3 bg-stone-800 text-amber-500 rounded-full mb-2 group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                    <i class="fa-solid fa-cloud-arrow-up text-lg sm:text-xl"></i>
                 </div>
-                <p class="text-xs font-bold text-stone-200">Drag & Drop Audio Files Here</p>
-                <p class="text-[11px] text-stone-400 mt-0.5">Supports MP3, WAV, FLAC, OGG, AAC, M4A</p>
+                <p class="text-xs font-bold text-stone-200">Tap to Browse or Drop Audio Files</p>
+                <p class="text-[10px] sm:text-[11px] text-stone-400 mt-0.5">Supports MP3, WAV, FLAC, M4A, OGG</p>
             </div>
 
             <!-- Cassette Deck Graphic Display -->
-            <div class="bg-stone-900 border border-stone-800 rounded-xl p-5 shadow-2xl relative overflow-hidden">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 sm:p-5 shadow-2xl relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-2">
                         <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" id="rec-indicator" style="display: none;"></span>
                         <span class="text-xs font-semibold uppercase tracking-wider text-stone-400" id="deck-status-label">Deck Idle</span>
                     </div>
-                    <span id="speed-indicator-badge" class="px-2 py-0.5 text-xs font-mono bg-stone-800 text-amber-400 rounded border border-amber-500/20">
+                    <span id="speed-indicator-badge" class="px-2 py-0.5 text-[11px] sm:text-xs font-mono bg-stone-800 text-amber-400 rounded border border-amber-500/20">
                         100.0% Speed (1.000x)
                     </span>
                 </div>
 
                 <!-- Cassette Shell Canvas/Graphic -->
-                <div class="relative bg-stone-950 border-2 border-stone-800 rounded-lg p-4 flex flex-col items-center justify-between shadow-inner h-56">
+                <div class="relative bg-stone-950 border-2 border-stone-800 rounded-lg p-3 sm:p-4 flex flex-col items-center justify-between shadow-inner h-52 sm:h-56">
                     <!-- Cassette Top Label -->
                     <div class="w-full bg-amber-100/90 text-stone-900 p-2 rounded flex justify-between items-center shadow-sm text-xs font-bold mb-2">
-                        <div class="flex items-center space-x-2">
-                            <span class="bg-stone-900 text-amber-400 px-1.5 py-0.5 rounded text-xs" id="active-side-badge">SIDE A</span>
-                            <span class="truncate max-w-[160px]" id="current-tape-title">Custom Mixtape</span>
+                        <div class="flex items-center space-x-2 truncate pr-1">
+                            <span class="bg-stone-900 text-amber-400 px-1.5 py-0.5 rounded text-[10px] sm:text-xs flex-shrink-0" id="active-side-badge">SIDE A</span>
+                            <span class="truncate" id="current-tape-title">Custom Mixtape</span>
                         </div>
-                        <div class="text-right font-mono text-stone-700">
+                        <div class="text-right font-mono text-stone-700 flex-shrink-0 text-xs">
                             C-<span id="tape-type-label">60</span>
                         </div>
                     </div>
 
                     <!-- Reels & Window -->
-                    <div class="relative w-full h-28 bg-stone-900/90 border border-stone-800 rounded-md p-2 flex items-center justify-around overflow-hidden">
+                    <div class="relative w-full h-24 sm:h-28 bg-stone-900/90 border border-stone-800 rounded-md p-2 flex items-center justify-around overflow-hidden">
                         <!-- Magnetic Tape Window Overlay -->
-                        <div class="absolute inset-x-8 top-3 bottom-3 bg-amber-950/20 rounded-full border border-amber-900/30 flex items-center justify-between px-6 pointer-events-none">
+                        <div class="absolute inset-x-6 sm:inset-x-8 top-3 bottom-3 bg-amber-950/20 rounded-full border border-amber-900/30 flex items-center justify-between px-4 sm:px-6 pointer-events-none">
                             <!-- Left Reel Spool -->
-                            <div class="relative w-16 h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
-                                <div id="left-reel-hub" class="w-10 h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
+                            <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
+                                <div id="left-reel-hub" class="w-8 h-8 sm:w-10 sm:h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
                                     <div class="w-2 h-2 bg-stone-400 rounded-full"></div>
                                 </div>
                             </div>
                             <!-- Right Reel Spool -->
-                            <div class="relative w-16 h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
-                                <div id="right-reel-hub" class="w-10 h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
+                            <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
+                                <div id="right-reel-hub" class="w-8 h-8 sm:w-10 sm:h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
                                     <div class="w-2 h-2 bg-stone-400 rounded-full"></div>
                                 </div>
                             </div>
@@ -160,18 +155,18 @@
 
                     <!-- Digital Time Counter & Controls -->
                     <div class="w-full flex items-center justify-between mt-3 pt-2 border-t border-stone-800/80">
-                        <div class="font-mono text-xl text-amber-500 tracking-wider font-bold bg-black/60 px-3 py-1 rounded border border-amber-500/20" id="deck-timer">
+                        <div class="font-mono text-base sm:text-xl text-amber-500 tracking-wider font-bold bg-black/60 px-2.5 sm:px-3 py-1 rounded border border-amber-500/20" id="deck-timer">
                             00:00.0
                         </div>
 
-                        <div class="flex items-center space-x-2">
-                            <button id="btn-prev" class="p-2 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-sm">
+                        <div class="flex items-center space-x-1.5 sm:space-x-2">
+                            <button id="btn-prev" class="p-2 sm:px-3 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-xs sm:text-sm active:scale-95" aria-label="Previous track">
                                 <i class="fa-solid fa-backward-step"></i>
                             </button>
-                            <button id="btn-play" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded transition text-sm flex items-center">
-                                <i class="fa-solid fa-play mr-1"></i> Play Deck
+                            <button id="btn-play" class="px-3 sm:px-4 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded transition text-xs sm:text-sm flex items-center shadow active:scale-95">
+                                <i class="fa-solid fa-play mr-1"></i> Play
                             </button>
-                            <button id="btn-next" class="p-2 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-sm">
+                            <button id="btn-next" class="p-2 sm:px-3 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-xs sm:text-sm active:scale-95" aria-label="Next track">
                                 <i class="fa-solid fa-forward-step"></i>
                             </button>
                         </div>
@@ -180,21 +175,21 @@
             </div>
 
             <!-- Tape Capacity & Hardware Speed Calibration Controls -->
-            <div class="bg-stone-900 border border-stone-800 rounded-xl p-5 space-y-5">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center">
+            <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 sm:p-5 space-y-4 sm:space-y-5">
+                <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center">
                     <i class="fa-solid fa-sliders mr-2"></i> Tape Deck & Capacity Settings
                 </h2>
 
                 <!-- Cassette Standard Selection -->
                 <div>
                     <label class="block text-xs font-semibold text-stone-400 mb-2">Cassette Capacity Standard</label>
-                    <div class="grid grid-cols-4 gap-2">
-                        <button class="tape-len-btn p-2 rounded text-xs font-mono font-bold border border-stone-700 hover:border-amber-500 bg-stone-800 text-stone-300" data-mins="45">C-45</button>
-                        <button class="tape-len-btn p-2 rounded text-xs font-mono font-bold border border-amber-500 bg-amber-500/20 text-amber-400" data-mins="60">C-60</button>
-                        <button class="tape-len-btn p-2 rounded text-xs font-mono font-bold border border-stone-700 hover:border-amber-500 bg-stone-800 text-stone-300" data-mins="90">C-90</button>
-                        <button class="tape-len-btn p-2 rounded text-xs font-mono font-bold border border-stone-700 hover:border-amber-500 bg-stone-800 text-stone-300" data-mins="120">C-120</button>
+                    <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
+                        <button class="tape-len-btn py-2 px-1 rounded text-xs font-mono font-bold border border-stone-700 hover:border-amber-500 bg-stone-800 text-stone-300 active:scale-95" data-mins="45">C-45</button>
+                        <button class="tape-len-btn py-2 px-1 rounded text-xs font-mono font-bold border border-amber-500 bg-amber-500/20 text-amber-400 active:scale-95" data-mins="60">C-60</button>
+                        <button class="tape-len-btn py-2 px-1 rounded text-xs font-mono font-bold border border-stone-700 hover:border-amber-500 bg-stone-800 text-stone-300 active:scale-95" data-mins="90">C-90</button>
+                        <button class="tape-len-btn py-2 px-1 rounded text-xs font-mono font-bold border border-stone-700 hover:border-amber-500 bg-stone-800 text-stone-300 active:scale-95" data-mins="120">C-120</button>
                     </div>
-                    <div class="mt-2 flex items-center space-x-2">
+                    <div class="mt-2.5 flex items-center justify-between sm:justify-start sm:space-x-2">
                         <span class="text-xs text-stone-400">Custom per side (mins):</span>
                         <input type="number" id="custom-side-mins" min="1" max="180" value="30" class="w-20 bg-stone-950 border border-stone-700 rounded px-2 py-1 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500">
                     </div>
@@ -203,10 +198,10 @@
                 <!-- Inter-Track Gap Setting -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-semibold text-stone-400">Inter-Track Silent Gap (Seconds)</label>
+                        <label class="text-xs font-semibold text-stone-400">Inter-Track Silent Gap</label>
                         <span id="gap-val-display" class="text-xs font-mono text-amber-400">2.0s</span>
                     </div>
-                    <input type="range" id="gap-slider" min="0" max="10" step="0.5" value="2.0" class="w-full accent-amber-500 bg-stone-800 rounded">
+                    <input type="range" id="gap-slider" min="0" max="10" step="0.5" value="2.0" class="w-full accent-amber-500 bg-stone-800 rounded py-1">
                 </div>
 
                 <!-- DSP Pre-Emphasis Encoding Profile Selector -->
@@ -215,7 +210,7 @@
                         <i class="fa-solid fa-wave-square mr-1.5 text-amber-500"></i>
                         DSP Pre-Emphasis Profile
                     </label>
-                    <select id="dsp-profile-select" class="w-full p-2 rounded text-xs font-mono bg-stone-950 text-amber-400 border border-stone-700 focus:outline-none focus:border-amber-500">
+                    <select id="dsp-profile-select" class="w-full p-2.5 rounded text-xs font-mono bg-stone-950 text-amber-400 border border-stone-700 focus:outline-none focus:border-amber-500">
                         <option value="modern">Modern Budget Deck Profile (5kHz +4.5dB, 1.4x Gain)</option>
                         <option value="dolby-b">Dolby B Emulation Profile (2kHz +10dB, Unity Gain)</option>
                         <option value="dolby-c">Dolby C Emulation Profile (Cascaded 375Hz & 2.5kHz +10dB, 0.85x Gain)</option>
@@ -233,21 +228,21 @@
                             Deck Speed Adjustment
                         </label>
                         <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">
-                            Playback/Export Only
+                            Pitch & Timing
                         </span>
                     </div>
                     <p class="text-[11px] text-stone-400 mb-3 leading-tight">
-                        Calculations use <b>100% exact durations</b> for layout fitting. Speed factor alters playback pitch/speed and adjusts rendered WAV file duration upon download.
+                        Compensates for motor speed drift. Alters playback and export duration/pitch.
                     </p>
 
                     <!-- Speed Preset Buttons -->
-                    <div class="grid grid-cols-3 gap-2 mb-3">
-                        <button class="speed-btn p-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500" data-speed="0">0% (1.000x)</button>
-                        <button class="speed-btn p-2 rounded text-xs font-mono border border-amber-500 bg-amber-500/20 text-amber-400 font-bold" data-speed="-5.75">-5.75% (0.9425x)</button>
-                        <button class="speed-btn p-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500" data-speed="-2.5">-2.5% (0.9750x)</button>
-                        <button class="speed-btn p-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500" data-speed="2.5">+2.5% (1.0250x)</button>
-                        <button class="speed-btn p-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500" data-speed="5.75">+5.75% (1.0575x)</button>
-                        <button class="speed-btn p-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500" id="btn-custom-speed">Custom %</button>
+                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3">
+                        <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" data-speed="0">0% (1.0x)</button>
+                        <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-amber-500 bg-amber-500/20 text-amber-400 font-bold active:scale-95" data-speed="-5.75">-5.75%</button>
+                        <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" data-speed="-2.5">-2.5%</button>
+                        <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" data-speed="2.5">+2.5%</button>
+                        <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" data-speed="5.75">+5.75%</button>
+                        <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" id="btn-custom-speed">Custom</button>
                     </div>
 
                     <!-- Custom Speed Offset (numeric input) -->
@@ -257,52 +252,52 @@
                             <span id="custom-speed-val" class="text-amber-400 font-bold">0.9425x</span>
                         </div>
                         <div class="flex items-stretch gap-1">
-                            <button type="button" id="speed-step-down" aria-label="Decrease speed offset by 0.01%" class="px-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500">&minus;</button>
+                            <button type="button" id="speed-step-down" aria-label="Decrease speed offset by 0.01%" class="px-3 py-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 active:scale-95">&minus;</button>
                             <div class="relative flex-1">
                                 <input type="text" id="speed-input" inputmode="decimal" autocomplete="off" spellcheck="false" value="-5.75" aria-describedby="speed-input-msg"
-                                       class="w-full p-2 pr-7 rounded text-sm font-mono text-right bg-stone-800 text-amber-400 border border-stone-700 focus:outline-none focus:border-amber-500">
-                                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono text-stone-400 pointer-events-none">%</span>
+                                       class="w-full p-2.5 pr-7 rounded text-sm font-mono text-right bg-stone-800 text-amber-400 border border-stone-700 focus:outline-none focus:border-amber-500">
+                                <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-stone-400 pointer-events-none">%</span>
                             </div>
-                            <button type="button" id="speed-step-up" aria-label="Increase speed offset by 0.01%" class="px-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500">+</button>
+                            <button type="button" id="speed-step-up" aria-label="Increase speed offset by 0.01%" class="px-3 py-2 rounded text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 active:scale-95">+</button>
                         </div>
-                        <p id="speed-input-msg" class="text-[10px] font-mono text-stone-500 h-3">Type a value (e.g. -5.73 or +1.25). Arrow keys step by 0.01%.</p>
+                        <p id="speed-input-msg" class="text-[10px] font-mono text-stone-500 h-3">Type value or use arrows (step 0.01%).</p>
                     </div>
                 </div>
 
                 <!-- Export / Download Rendered Audio -->
                 <div class="pt-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <button id="btn-export-side-a" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-extrabold rounded-lg shadow-lg shadow-amber-600/20 transition flex items-center justify-center space-x-2 text-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button id="btn-export-side-a" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-extrabold rounded-lg shadow-lg shadow-amber-600/20 transition flex items-center justify-center space-x-2 text-xs sm:text-sm active:scale-95">
                             <i class="fa-solid fa-download text-base"></i>
                             <span>Export Side A WAV</span>
                         </button>
-                        <button id="btn-export-side-b" class="w-full py-3 bg-gradient-to-r from-stone-700 to-stone-600 hover:from-stone-600 hover:to-stone-500 text-white font-extrabold rounded-lg shadow-lg transition flex items-center justify-center space-x-2 text-sm">
+                        <button id="btn-export-side-b" class="w-full py-3 bg-gradient-to-r from-stone-700 to-stone-600 hover:from-stone-600 hover:to-stone-500 text-white font-extrabold rounded-lg shadow-lg transition flex items-center justify-center space-x-2 text-xs sm:text-sm active:scale-95">
                             <i class="fa-solid fa-download text-base"></i>
                             <span>Export Side B WAV</span>
                         </button>
                     </div>
                     <p class="text-[10px] text-center text-stone-500 mt-2">
-                        Each button exports that side's assigned tracks and silent gaps as a continuous WAV, applying the selected DSP profile, safety limiter, and calibrated deck speed.
+                        Applies selected DSP pre-emphasis, safety brickwall limiter, and calibrated speed.
                     </p>
                 </div>
             </div>
         </div>
 
         <!-- Right Panel: Tape Layout Optimizer & Track Allocation -->
-        <div class="lg:col-span-7 space-y-6">
+        <div class="lg:col-span-7 space-y-5 sm:space-y-6">
 
             <!-- Toolbar & Auto-Fit Action -->
-            <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 class="font-bold text-stone-200 text-sm">Layout Auto-Fitting</h2>
-                    <p class="text-xs text-stone-400">Optimizes track distribution based on exact original track lengths.</p>
+                    <h2 class="font-bold text-stone-200 text-xs sm:text-sm">Layout Auto-Fitting</h2>
+                    <p class="text-[11px] sm:text-xs text-stone-400">Bin-packs tracks to fit cassette side lengths.</p>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button id="btn-autofit" class="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center">
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                    <button id="btn-autofit" class="flex-1 sm:flex-none bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center justify-center active:scale-95">
                         <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Auto-Fit Bin Pack
                     </button>
-                    <button id="btn-clear-all" class="bg-stone-800 hover:bg-stone-700 text-stone-400 text-xs font-semibold px-3 py-2 rounded-lg transition">
-                        Clear Tracks
+                    <button id="btn-clear-all" class="bg-stone-800 hover:bg-stone-700 text-stone-400 text-xs font-semibold px-3 py-2 rounded-lg transition active:scale-95">
+                        Clear
                     </button>
                 </div>
             </div>
@@ -316,7 +311,7 @@
                         <!-- Header & Capacity Meter -->
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center space-x-2">
-                                <span class="px-2 py-0.5 bg-amber-500 text-stone-950 font-extrabold text-xs rounded">SIDE A</span>
+                                <span class="px-2 py-0.5 bg-amber-500 text-stone-950 font-extrabold text-[11px] rounded">SIDE A</span>
                                 <span class="text-xs font-mono text-stone-300" id="side-a-track-count">0 tracks</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-amber-400" id="side-a-time-text">00:00 / 30:00</span>
@@ -328,9 +323,9 @@
                         </div>
 
                         <!-- Track Drop Area -->
-                        <div id="side-a-list" class="min-h-[180px] max-h-[300px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
-                            <div class="text-center py-10 text-stone-600 text-xs empty-prompt">
-                                Drop audio tracks here for Side A
+                        <div id="side-a-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
+                            <div class="text-center py-8 text-stone-600 text-xs empty-prompt">
+                                Drop or assign tracks for Side A
                             </div>
                         </div>
                     </div>
@@ -348,7 +343,7 @@
                         <!-- Header & Capacity Meter -->
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center space-x-2">
-                                <span class="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-300 font-extrabold text-xs rounded">SIDE B</span>
+                                <span class="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-300 font-extrabold text-[11px] rounded">SIDE B</span>
                                 <span class="text-xs font-mono text-stone-300" id="side-b-track-count">0 tracks</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-amber-400" id="side-b-time-text">00:00 / 30:00</span>
@@ -360,9 +355,9 @@
                         </div>
 
                         <!-- Track Drop Area -->
-                        <div id="side-b-list" class="min-h-[180px] max-h-[300px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
-                            <div class="text-center py-10 text-stone-600 text-xs empty-prompt">
-                                Drop audio tracks here for Side B
+                        <div id="side-b-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
+                            <div class="text-center py-8 text-stone-600 text-xs empty-prompt">
+                                Drop or assign tracks for Side B
                             </div>
                         </div>
                     </div>
@@ -381,16 +376,16 @@
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-2">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">Unassigned Track Pool</h3>
-                        <span id="pool-count" class="px-2 py-0.5 bg-stone-800 text-stone-300 text-xs rounded font-mono">0</span>
+                        <span id="pool-count" class="px-2 py-0.5 bg-stone-800 text-stone-300 text-[11px] rounded font-mono">0</span>
                     </div>
-                    <span class="text-[11px] text-stone-500">
-                        Original Unscaled Lengths
+                    <span class="text-[10px] sm:text-[11px] text-stone-500">
+                        Original Lengths
                     </span>
                 </div>
 
-                <div id="unassigned-pool" class="min-h-[120px] max-h-[220px] overflow-y-auto p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg space-y-2">
-                    <div class="text-center py-8 text-stone-600 text-xs empty-prompt">
-                        No audio files loaded yet. Click "Add Audio Tracks" to begin.
+                <div id="unassigned-pool" class="min-h-[110px] max-h-[200px] overflow-y-auto p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg space-y-2">
+                    <div class="text-center py-6 text-stone-600 text-xs empty-prompt">
+                        No audio files loaded yet. Click "Add Tracks" to begin.
                     </div>
                 </div>
             </div>
@@ -398,9 +393,9 @@
         </div>
     </main>
 
-    <!-- Notification Toast / Dialog Container -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-stone-900 border border-amber-500/40 text-stone-100 px-4 py-3 rounded-lg shadow-2xl transition-all opacity-0 translate-y-4 pointer-events-none z-50 flex items-center space-x-3 text-sm">
-        <i class="fa-solid fa-circle-info text-amber-400"></i>
+    <!-- Notification Toast Container -->
+    <div id="toast" class="fixed bottom-5 right-5 left-5 sm:left-auto bg-stone-900 border border-amber-500/40 text-stone-100 px-4 py-3 rounded-lg shadow-2xl transition-all opacity-0 translate-y-4 pointer-events-none z-50 flex items-center space-x-3 text-xs sm:text-sm text-center sm:text-left justify-center sm:justify-start">
+        <i class="fa-solid fa-circle-info text-amber-400 flex-shrink-0"></i>
         <span id="toast-msg">Notification message</span>
     </div>
 
@@ -423,7 +418,6 @@
         let currentSourceNode = null;
         let analyserNode = null;
         let playStartTime = 0;
-        let pauseOffset = 0;
         let animFrameId = null;
 
         // DOM Elements
@@ -501,10 +495,8 @@
             const sideBTracks = state.tracks.filter(t => t.side === 'B');
             const poolTracks = state.tracks.filter(t => t.side === 'pool');
 
-            // 1. Exact calculations using ORIGINAL track durations
             const durA = calculateSideDuration(sideATracks);
             const durB = calculateSideDuration(sideBTracks);
-
             const cap = state.sideCapacitySeconds;
 
             // Side A Stats
@@ -513,8 +505,8 @@
             barA.style.width = `${pctA}%`;
             barA.className = `h-full transition-all duration-300 ${durA > cap ? 'bg-red-500' : 'bg-amber-500'}`;
             document.getElementById('side-a-time-text').textContent = `${formatTime(durA)} / ${formatTime(cap)}`;
-            document.getElementById('side-a-track-count').textContent = `${sideATracks.length} track${sideATracks.length === 1 ? '' : 's'}`;
-            document.getElementById('side-a-remaining').textContent = durA > cap ? `OVERFLOW +${formatTime(durA - cap)}` : formatTime(cap - durA);
+            document.getElementById('side-a-track-count').textContent = `${sideATracks.length} trk${sideATracks.length === 1 ? '' : 's'}`;
+            document.getElementById('side-a-remaining').textContent = durA > cap ? `OVER +${formatTime(durA - cap)}` : formatTime(cap - durA);
 
             // Side B Stats
             const barB = document.getElementById('side-b-bar');
@@ -522,8 +514,8 @@
             barB.style.width = `${pctB}%`;
             barB.className = `h-full transition-all duration-300 ${durB > cap ? 'bg-red-500' : 'bg-amber-500'}`;
             document.getElementById('side-b-time-text').textContent = `${formatTime(durB)} / ${formatTime(cap)}`;
-            document.getElementById('side-b-track-count').textContent = `${sideBTracks.length} track${sideBTracks.length === 1 ? '' : 's'}`;
-            document.getElementById('side-b-remaining').textContent = durB > cap ? `OVERFLOW +${formatTime(durB - cap)}` : formatTime(cap - durB);
+            document.getElementById('side-b-track-count').textContent = `${sideBTracks.length} trk${sideBTracks.length === 1 ? '' : 's'}`;
+            document.getElementById('side-b-remaining').textContent = durB > cap ? `OVER +${formatTime(durB - cap)}` : formatTime(cap - durB);
 
             // Pool Count
             document.getElementById('pool-count').textContent = poolTracks.length;
@@ -535,7 +527,7 @@
 
             // Update Speed Indicator Text
             const rate = 1 + (state.speedPercent / 100);
-            speedIndicatorBadge.textContent = `${state.speedPercent >= 0 ? '+' : ''}${state.speedPercent.toFixed(2)}% Speed (${rate.toFixed(4)}x)`;
+            speedIndicatorBadge.textContent = `${state.speedPercent >= 0 ? '+' : ''}${state.speedPercent.toFixed(2)}% (${rate.toFixed(3)}x)`;
         }
 
         // Render Track Items inside containers
@@ -543,18 +535,18 @@
             container.innerHTML = '';
             if (trackList.length === 0) {
                 const emptyMsg = sideKey === 'pool' 
-                    ? 'No audio files loaded yet. Click "Add Audio Tracks" to begin.' 
-                    : `Drop audio tracks here for Side ${sideKey}`;
-                container.innerHTML = `<div class="text-center py-8 text-stone-600 text-xs empty-prompt">${emptyMsg}</div>`;
+                    ? 'No audio files loaded yet. Tap "Add Tracks" above.' 
+                    : `Drop tracks here for Side ${sideKey}`;
+                container.innerHTML = `<div class="text-center py-6 text-stone-600 text-xs empty-prompt">${emptyMsg}</div>`;
                 return;
             }
 
             trackList.forEach((track, idx) => {
                 const item = document.createElement('div');
-                item.className = `p-2.5 bg-stone-900 border rounded-lg flex items-center justify-between text-xs transition cursor-grab active:cursor-grabbing ${
+                item.className = `p-2.5 bg-stone-900 border rounded-lg flex items-center justify-between text-xs transition ${
                     state.isPlaying && state.activeSide === sideKey && state.playingIndex === idx
                         ? 'border-amber-500 bg-amber-500/10'
-                        : 'border-stone-800 hover:border-stone-700'
+                        : 'border-stone-800'
                 }`;
                 item.draggable = true;
                 item.dataset.trackId = track.id;
@@ -565,23 +557,25 @@
                 });
 
                 item.innerHTML = `
-                    <div class="flex items-center space-x-2.5 truncate mr-2">
-                        <i class="fa-solid fa-grip-lines text-stone-600 text-xs"></i>
-                        <button class="play-single-btn text-stone-400 hover:text-amber-400 transition" title="Preview track">
+                    <div class="flex items-center space-x-2 truncate mr-2">
+                        <button class="play-single-btn text-stone-400 hover:text-amber-400 p-1 transition" title="Preview track">
                             <i class="fa-solid ${state.isPlaying && state.activeSide === sideKey && state.playingIndex === idx ? 'fa-pause text-amber-500' : 'fa-play'}"></i>
                         </button>
                         <span class="font-medium text-stone-200 truncate">${track.name}</span>
                     </div>
-                    <div class="flex items-center space-x-2 flex-shrink-0">
-                        <span class="font-mono text-stone-400 text-[11px] bg-stone-950 px-1.5 py-0.5 rounded border border-stone-800">
+                    <div class="flex items-center space-x-1.5 flex-shrink-0">
+                        <span class="font-mono text-stone-400 text-[10px] sm:text-[11px] bg-stone-950 px-1.5 py-0.5 rounded border border-stone-800">
                             ${formatTime(track.duration)}
                         </span>
                         ${sideKey !== 'pool' ? `
-                            <button class="move-pool-btn text-stone-500 hover:text-stone-300 p-1" title="Move to unassigned pool" aria-label="Move ${track.name} to unassigned pool">
+                            <button class="move-pool-btn text-stone-500 hover:text-stone-300 p-1.5" title="Move to pool">
                                 <i class="fa-solid fa-arrow-rotate-left"></i>
                             </button>
-                        ` : ''}
-                        <button class="delete-track-btn text-red-400/80 hover:text-red-300 hover:bg-red-500/10 rounded p-1.5 transition" title="Remove song permanently from this session" aria-label="Delete ${track.name}">
+                        ` : `
+                            <button class="move-side-a text-amber-500 hover:text-amber-400 px-1 py-0.5 font-bold text-[10px] bg-amber-500/10 rounded" title="Move to Side A">A</button>
+                            <button class="move-side-b text-stone-300 hover:text-white px-1 py-0.5 font-bold text-[10px] bg-stone-800 rounded" title="Move to Side B">B</button>
+                        `}
+                        <button class="delete-track-btn text-red-400/80 hover:text-red-300 p-1.5 rounded transition" title="Remove track">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -605,22 +599,24 @@
                         track.side = 'pool';
                         updateUI();
                     });
+                } else {
+                    item.querySelector('.move-side-a').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        track.side = 'A';
+                        updateUI();
+                    });
+                    item.querySelector('.move-side-b').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        track.side = 'B';
+                        updateUI();
+                    });
                 }
 
-                // Delete this song from the loaded playlist, regardless of its side.
                 item.querySelector('.delete-track-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const confirmed = window.confirm(`Remove "${track.name}" from the playlist? This cannot be undone without adding the file again.`);
-                    if (!confirmed) return;
-
-                    // Stop playback before changing list indexes to avoid playing the wrong track.
-                    if (state.isPlaying || currentSourceNode) {
-                        stopPlayback();
-                    }
-
+                    if (state.isPlaying || currentSourceNode) stopPlayback();
                     state.tracks = state.tracks.filter(t => t.id !== track.id);
                     state.playingIndex = -1;
-                    pauseOffset = 0;
                     updateUI();
                     showToast(`Removed "${track.name}".`);
                 });
@@ -635,7 +631,7 @@
             const validFiles = Array.from(files).filter(f => f.type.startsWith('audio/') || /\.(mp3|wav|flac|ogg|m4a|aac|webm)$/i.test(f.name));
             if (validFiles.length === 0) return;
 
-            showToast(`Loading and decoding ${validFiles.length} track(s)...`);
+            showToast(`Decoding ${validFiles.length} track(s)...`);
 
             for (const file of validFiles) {
                 try {
@@ -645,13 +641,13 @@
                     state.tracks.push({
                         id: 'track_' + Math.random().toString(36).substr(2, 9),
                         name: file.name.replace(/\.[^/.]+$/, ""),
-                        duration: audioBuffer.duration, // EXACT ORIGINAL UNTOUCHED DURATION
+                        duration: audioBuffer.duration,
                         buffer: audioBuffer,
                         side: 'pool'
                     });
                 } catch (err) {
                     console.error("Audio decoding error:", err);
-                    showToast(`Failed to decode file: ${file.name}`);
+                    showToast(`Failed to decode: ${file.name}`);
                 }
             }
 
@@ -662,7 +658,7 @@
         audioInput.addEventListener('change', (e) => processAudioFiles(e.target.files));
         dropzoneFileInput.addEventListener('change', (e) => processAudioFiles(e.target.files));
 
-        // Drag and Drop Audio File Listeners on Dropzone
+        // Drag and Drop Listeners
         ['dragenter', 'dragover'].forEach(eventName => {
             fileDropzone.addEventListener(eventName, (e) => {
                 e.preventDefault();
@@ -679,12 +675,10 @@
 
         fileDropzone.addEventListener('drop', (e) => {
             const files = e.dataTransfer.files;
-            if (files && files.length > 0) {
-                processAudioFiles(files);
-            }
+            if (files && files.length > 0) processAudioFiles(files);
         });
 
-        // Setup Drag & Drop Zone logic across lists
+        // Drop zone mapping across lists
         [
             { el: sideAList, side: 'A' },
             { el: sideBList, side: 'B' },
@@ -702,17 +696,14 @@
             });
         });
 
-        // Auto-Fit Bin Packing Algorithm (Uses original durations!)
+        // Auto-Fit Bin Packing Algorithm
         document.getElementById('btn-autofit').addEventListener('click', () => {
             if (state.tracks.length === 0) {
                 showToast("Please add tracks first.");
                 return;
             }
 
-            // Reset all tracks to pool
             state.tracks.forEach(t => t.side = 'pool');
-
-            // Sort tracks descending by duration for best-fit heuristic
             const sorted = [...state.tracks].sort((a, b) => b.duration - a.duration);
             
             let capA = state.sideCapacitySeconds;
@@ -721,7 +712,6 @@
             let currentDurB = 0;
 
             sorted.forEach(track => {
-                // Calculate incremental duration with gap
                 const costA = currentDurA === 0 ? track.duration : track.duration + state.gapSeconds;
                 const costB = currentDurB === 0 ? track.duration : track.duration + state.gapSeconds;
 
@@ -735,19 +725,19 @@
             });
 
             updateUI();
-            showToast("Auto-fitted tracks into Side A & B based on capacity.");
+            showToast("Auto-fitted tracks into Side A & B!");
         });
 
-        // Clear All Tracks
+        // Clear All
         document.getElementById('btn-clear-all').addEventListener('click', () => {
             if (state.isPlaying) stopPlayback();
             state.tracks = [];
             updateUI();
         });
 
-        // Capacity Buttons Selection
+        // Capacity Buttons
         document.querySelectorAll('.tape-len-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 document.querySelectorAll('.tape-len-btn').forEach(b => {
                     b.classList.remove('border-amber-500', 'bg-amber-500/20', 'text-amber-400');
                     b.classList.add('border-stone-700', 'bg-stone-800', 'text-stone-300');
@@ -763,7 +753,6 @@
             });
         });
 
-        // Custom Mins Input
         document.getElementById('custom-side-mins').addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
             if (!isNaN(val) && val > 0) {
@@ -773,33 +762,24 @@
             }
         });
 
-        // Silent Gap Slider
         gapSlider.addEventListener('input', (e) => {
             state.gapSeconds = parseFloat(e.target.value);
             gapValDisplay.textContent = `${state.gapSeconds.toFixed(1)}s`;
             updateUI();
         });
 
-        // DSP Profile Listener
         dspProfileSelect.addEventListener('change', (e) => {
             state.dspProfile = e.target.value;
         });
 
-        // ---- Speed Offset: validation, persistence, and controls ----
+        // Speed Offset Logic
         const SPEED_MIN = -15;
         const SPEED_MAX = 15;
-        const DEFAULT_SPEED_PERCENT = state.speedPercent; // existing default (-5.75)
+        const DEFAULT_SPEED_PERCENT = state.speedPercent;
         const SPEED_STORAGE_KEY = 'cassetteTapeOptimizer.speedPercent';
-        const SPEED_INPUT_HINT = 'Type a value (e.g. -5.73 or +1.25). Arrow keys step by 0.01%.';
-        const PRESET_ACTIVE_CLASSES = ['border-amber-500', 'bg-amber-500/20', 'text-amber-400', 'font-bold'];
-        const PRESET_INACTIVE_CLASSES = ['border-stone-700', 'bg-stone-800', 'text-stone-300'];
+        const SPEED_INPUT_HINT = 'Type value (-15 to +15).';
 
-        // Round to 0.01% precision (avoids floating point noise like 1.2500000001)
-        function roundSpeed(value) {
-            return Math.round(value * 100) / 100;
-        }
-
-        // Strictly parse user text like "-5.73", "+1.25", "1,5", "-5.73%". Returns a finite number or null.
+        function roundSpeed(value) { return Math.round(value * 100) / 100; }
         function parseSpeedText(text) {
             if (typeof text !== 'string') return null;
             const cleaned = text.trim().replace(/%$/, '').trim().replace(',', '.');
@@ -807,22 +787,11 @@
             const num = parseFloat(cleaned);
             return Number.isFinite(num) ? num : null;
         }
+        function isSpeedInRange(value) { return Number.isFinite(value) && value >= SPEED_MIN && value <= SPEED_MAX; }
+        function formatSpeedForInput(value) { return value.toFixed(2); }
 
-        function isSpeedInRange(value) {
-            return Number.isFinite(value) && value >= SPEED_MIN && value <= SPEED_MAX;
-        }
-
-        function formatSpeedForInput(value) {
-            return value.toFixed(2);
-        }
-
-        // Persistence (wrapped: localStorage can be unavailable or throw for file:// / private mode)
         function saveSpeedOffset(value) {
-            try {
-                window.localStorage.setItem(SPEED_STORAGE_KEY, String(value));
-            } catch (err) {
-                // Storage unavailable; the app keeps working without persistence.
-            }
+            try { window.localStorage.setItem(SPEED_STORAGE_KEY, String(value)); } catch (err) {}
         }
 
         function loadSavedSpeedOffset() {
@@ -830,38 +799,31 @@
                 const raw = window.localStorage.getItem(SPEED_STORAGE_KEY);
                 if (raw === null) return DEFAULT_SPEED_PERCENT;
                 const parsed = parseSpeedText(raw);
-                if (parsed === null || !isSpeedInRange(parsed)) return DEFAULT_SPEED_PERCENT;
-                return roundSpeed(parsed);
-            } catch (err) {
-                return DEFAULT_SPEED_PERCENT;
-            }
+                return (parsed !== null && isSpeedInRange(parsed)) ? roundSpeed(parsed) : DEFAULT_SPEED_PERCENT;
+            } catch (err) { return DEFAULT_SPEED_PERCENT; }
         }
 
         function setSpeedMessage(text, isError) {
             speedInputMsg.textContent = text;
             speedInputMsg.classList.toggle('text-red-400', !!isError);
-            speedInputMsg.classList.toggle('text-stone-500', !isError);
-            speedInput.classList.toggle('border-red-500', !!isError);
-            speedInput.classList.toggle('border-stone-700', !isError);
         }
 
-        // Highlight the matching preset button, or "Custom %" if no preset matches
         function highlightSpeedButtons() {
             let matched = false;
             document.querySelectorAll('.speed-btn').forEach(b => {
-                b.classList.remove(...PRESET_ACTIVE_CLASSES);
-                b.classList.add(...PRESET_INACTIVE_CLASSES);
+                b.classList.remove('border-amber-500', 'bg-amber-500/20', 'text-amber-400', 'font-bold');
+                b.classList.add('border-stone-700', 'bg-stone-800', 'text-stone-300');
             });
             document.querySelectorAll('.speed-btn[data-speed]').forEach(b => {
                 if (!matched && Math.abs(parseFloat(b.dataset.speed) - state.speedPercent) < 0.0005) {
                     matched = true;
-                    b.classList.remove(...PRESET_INACTIVE_CLASSES);
-                    b.classList.add(...PRESET_ACTIVE_CLASSES);
+                    b.classList.remove('border-stone-700', 'bg-stone-800', 'text-stone-300');
+                    b.classList.add('border-amber-500', 'bg-amber-500/20', 'text-amber-400', 'font-bold');
                 }
             });
             if (!matched) {
-                btnCustomSpeed.classList.remove(...PRESET_INACTIVE_CLASSES);
-                btnCustomSpeed.classList.add(...PRESET_ACTIVE_CLASSES);
+                btnCustomSpeed.classList.remove('border-stone-700', 'bg-stone-800', 'text-stone-300');
+                btnCustomSpeed.classList.add('border-amber-500', 'bg-amber-500/20', 'text-amber-400', 'font-bold');
             }
         }
 
@@ -869,33 +831,27 @@
             customSpeedVal.textContent = `${(1 + state.speedPercent / 100).toFixed(4)}x`;
         }
 
-        // Apply Speed Offset to state, active playing source on the fly, indicators, and storage.
-        // Only ever called with a valid, in-range value.
         function setSpeedAdjustment(speedPercent, options = {}) {
             const value = roundSpeed(Math.min(SPEED_MAX, Math.max(SPEED_MIN, speedPercent)));
             state.speedPercent = value;
             const rate = 1 + (state.speedPercent / 100);
 
             if (currentSourceNode && state.isPlaying) {
-                // Directly set Web Audio source node playbackRate
                 currentSourceNode.playbackRate.value = Math.max(0.1, rate);
             }
             saveSpeedOffset(value);
-            if (!options.keepInputText) {
-                speedInput.value = formatSpeedForInput(value);
-            }
+            if (!options.keepInputText) speedInput.value = formatSpeedForInput(value);
             setSpeedMessage(SPEED_INPUT_HINT, false);
             highlightSpeedButtons();
             updateSpeedRateLabel();
             updateUI();
         }
 
-        // Hardware Speed Control Presets
         document.querySelectorAll('.speed-btn').forEach(btn => {
             if (btn.id === 'btn-custom-speed') return;
             btn.addEventListener('click', () => {
-                const presetValue = parseFloat(btn.dataset.speed);
-                if (isSpeedInRange(presetValue)) setSpeedAdjustment(presetValue);
+                const val = parseFloat(btn.dataset.speed);
+                if (isSpeedInRange(val)) setSpeedAdjustment(val);
             });
         });
 
@@ -905,31 +861,18 @@
             speedInput.select();
         });
 
-        // Live typing: apply only complete, valid, in-range values; never rewrite the text while typing.
         speedInput.addEventListener('input', () => {
             const text = speedInput.value.trim();
-            if (text === '' || /^[+-]?\.?$/.test(text) || /^[+-]?\d+[.,]$/.test(text)) {
-                setSpeedMessage(SPEED_INPUT_HINT, false); // incomplete entry, wait for more typing
-                return;
-            }
+            if (text === '' || /^[+-]?\.?$/.test(text) || /^[+-]?\d+[.,]$/.test(text)) return;
             const parsed = parseSpeedText(text);
-            if (parsed === null) {
-                setSpeedMessage('Invalid number. Last valid offset kept.', true);
-                return;
-            }
-            if (!isSpeedInRange(parsed)) {
-                setSpeedMessage(`Out of range. Use ${SPEED_MIN}% to +${SPEED_MAX}%. Last valid offset kept.`, true);
-                return;
-            }
+            if (parsed === null || !isSpeedInRange(parsed)) return;
             setSpeedAdjustment(parsed, { keepInputText: true });
         });
 
-        // On commit (blur / Enter / change): clamp out-of-range, restore on invalid/empty, then normalize text
         function commitSpeedInput() {
             const parsed = parseSpeedText(speedInput.value);
             if (parsed === null) {
                 speedInput.value = formatSpeedForInput(state.speedPercent);
-                setSpeedMessage(SPEED_INPUT_HINT, false);
                 return;
             }
             setSpeedAdjustment(Math.min(SPEED_MAX, Math.max(SPEED_MIN, parsed)));
@@ -937,27 +880,21 @@
         speedInput.addEventListener('change', commitSpeedInput);
         speedInput.addEventListener('blur', commitSpeedInput);
 
-        function stepSpeed(direction) {
+        function stepSpeed(dir) {
             const parsed = parseSpeedText(speedInput.value);
             const base = (parsed !== null && isSpeedInRange(parsed)) ? parsed : state.speedPercent;
-            setSpeedAdjustment(base + direction * 0.01);
+            setSpeedAdjustment(base + dir * 0.01);
         }
 
-        speedInput.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowUp') { e.preventDefault(); stepSpeed(1); }
-            else if (e.key === 'ArrowDown') { e.preventDefault(); stepSpeed(-1); }
-            else if (e.key === 'Enter') { e.preventDefault(); commitSpeedInput(); speedInput.blur(); }
-        });
         speedStepUp.addEventListener('click', () => stepSpeed(1));
         speedStepDown.addEventListener('click', () => stepSpeed(-1));
 
-        // Restore the last saved (validated) offset before first render
         state.speedPercent = loadSavedSpeedOffset();
         speedInput.value = formatSpeedForInput(state.speedPercent);
         highlightSpeedButtons();
         updateSpeedRateLabel();
 
-        // Live Deck Playback Engine
+        // Live Playback Engine
         function playTrackAtIndex(index) {
             initAudioContext();
             const sideTracks = state.tracks.filter(t => t.side === state.activeSide);
@@ -979,7 +916,6 @@
             currentSourceNode = audioCtx.createBufferSource();
             currentSourceNode.buffer = track.buffer;
 
-            // Apply playback rate speed correction directly to Live Playback Node
             const rate = 1 + (state.speedPercent / 100);
             currentSourceNode.playbackRate.value = Math.max(0.1, rate);
 
@@ -989,18 +925,14 @@
             playStartTime = audioCtx.currentTime;
             currentSourceNode.start(0);
 
-            // Handle track ending -> trigger next track after configured silent gap
             currentSourceNode.onended = () => {
                 if (state.isPlaying) {
                     setTimeout(() => {
-                        if (state.isPlaying) {
-                            playTrackAtIndex(state.playingIndex + 1);
-                        }
+                        if (state.isPlaying) playTrackAtIndex(state.playingIndex + 1);
                     }, state.gapSeconds * 1000);
                 }
             };
 
-            // UI updates for deck
             btnPlay.innerHTML = `<i class="fa-solid fa-pause mr-1"></i> Pause`;
             deckStatusLabel.textContent = `Playing Side ${state.activeSide} [Trk ${index + 1}]`;
             recIndicator.style.display = 'inline-block';
@@ -1012,11 +944,9 @@
         }
 
         function pausePlayback() {
-            if (currentSourceNode) {
-                currentSourceNode.stop();
-            }
+            if (currentSourceNode) currentSourceNode.stop();
             state.isPlaying = false;
-            btnPlay.innerHTML = `<i class="fa-solid fa-play mr-1"></i> Play Deck`;
+            btnPlay.innerHTML = `<i class="fa-solid fa-play mr-1"></i> Play`;
             deckStatusLabel.textContent = `Deck Paused`;
             recIndicator.style.display = 'none';
             document.getElementById('left-reel-hub').classList.remove('spinning');
@@ -1039,30 +969,23 @@
             } else {
                 const sideTracks = state.tracks.filter(t => t.side === state.activeSide);
                 if (sideTracks.length === 0) {
-                    showToast(`No tracks assigned to Side ${state.activeSide}`);
+                    showToast(`No tracks on Side ${state.activeSide}`);
                     return;
                 }
-                const startIndex = state.playingIndex >= 0 ? state.playingIndex : 0;
-                playTrackAtIndex(startIndex);
+                playTrackAtIndex(state.playingIndex >= 0 ? state.playingIndex : 0);
             }
         });
 
         btnNext.addEventListener('click', () => {
             const sideTracks = state.tracks.filter(t => t.side === state.activeSide);
-            if (state.playingIndex + 1 < sideTracks.length) {
-                playTrackAtIndex(state.playingIndex + 1);
-            }
+            if (state.playingIndex + 1 < sideTracks.length) playTrackAtIndex(state.playingIndex + 1);
         });
 
         btnPrev.addEventListener('click', () => {
-            if (state.playingIndex > 0) {
-                playTrackAtIndex(state.playingIndex - 1);
-            } else {
-                playTrackAtIndex(0);
-            }
+            if (state.playingIndex > 0) playTrackAtIndex(state.playingIndex - 1);
+            else playTrackAtIndex(0);
         });
 
-        // Reel Timer & Visualizer Loop
         function startTimerAnimation() {
             const canvas = document.getElementById('deck-visualizer');
             const ctx = canvas.getContext('2d');
@@ -1070,11 +993,9 @@
 
             function draw() {
                 if (!state.isPlaying) return;
-
                 const elapsed = (audioCtx.currentTime - playStartTime) * (1 + state.speedPercent / 100);
                 deckTimer.textContent = formatTime(elapsed);
 
-                // Render simple visualizer waveform
                 analyserNode.getByteFrequencyData(dataArray);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#f59e0b';
@@ -1086,165 +1007,89 @@
                     ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
                     x += barWidth;
                 }
-
                 animFrameId = requestAnimationFrame(draw);
             }
             draw();
         }
 
-        // OFFLINE AUDIO RENDER & DOWNLOAD STITCHING ENGINE (WITH PRE-EMPHASIS & LIMITER)
+        // Export Engine
         document.getElementById('btn-export-side-a').addEventListener('click', () => exportSideWav('A'));
         document.getElementById('btn-export-side-b').addEventListener('click', () => exportSideWav('B'));
 
-        // Configures the DSP filter stages based on the selected profile
         function setupDspProfile(offlineCtx) {
-            let entryNode = null;
-            let exitNode = null;
-            let profilePrefix = "STANDARD";
+            let entryNode = null, exitNode = null, profilePrefix = "STANDARD";
 
             switch (state.dspProfile) {
-                case 'modern': {
-                    // Profile 1: Modern Budget Deck Profile
-                    // Single-stage Biquad high-shelf: Freq 5000Hz, Gain +4.5dB, GainNode multiplier 1.4 (+3dB makeup)
+                case 'modern':
                     profilePrefix = "MODERN-BUDGET";
-                    const filter = offlineCtx.createBiquadFilter();
-                    filter.type = 'highshelf';
-                    filter.frequency.value = 5000;
-                    filter.gain.value = 4.5;
-
-                    const gainNode = offlineCtx.createGain();
-                    gainNode.gain.value = 1.4;
-
-                    filter.connect(gainNode);
-                    entryNode = filter;
-                    exitNode = gainNode;
+                    const f1 = offlineCtx.createBiquadFilter();
+                    f1.type = 'highshelf'; f1.frequency.value = 5000; f1.gain.value = 4.5;
+                    const g1 = offlineCtx.createGain(); g1.gain.value = 1.4;
+                    f1.connect(g1); entryNode = f1; exitNode = g1;
                     break;
-                }
-                case 'dolby-b': {
-                    // Profile 2: Dolby B Emulation Profile
-                    // Single-stage Biquad high-shelf: Freq 2000Hz, Gain +10.0dB, GainNode multiplier 1.0
+                case 'dolby-b':
                     profilePrefix = "DOLBY-B";
-                    const filter = offlineCtx.createBiquadFilter();
-                    filter.type = 'highshelf';
-                    filter.frequency.value = 2000;
-                    filter.gain.value = 10.0;
-
-                    const gainNode = offlineCtx.createGain();
-                    gainNode.gain.value = 1.0;
-
-                    filter.connect(gainNode);
-                    entryNode = filter;
-                    exitNode = gainNode;
+                    const f2 = offlineCtx.createBiquadFilter();
+                    f2.type = 'highshelf'; f2.frequency.value = 2000; f2.gain.value = 10.0;
+                    const g2 = offlineCtx.createGain(); g2.gain.value = 1.0;
+                    f2.connect(g2); entryNode = f2; exitNode = g2;
                     break;
-                }
-                case 'dolby-c': {
-                    // Profile 3: Dolby C Emulation Profile
-                    // Dual-stage series cascading Biquad high-shelf filter arrangement
-                    // Stage 1: 375 Hz, +10.0 dB | Stage 2: 2500 Hz, +10.0 dB | GainNode: 0.85
+                case 'dolby-c':
                     profilePrefix = "DOLBY-C";
-                    const stage1 = offlineCtx.createBiquadFilter();
-                    stage1.type = 'highshelf';
-                    stage1.frequency.value = 375;
-                    stage1.gain.value = 10.0;
-
-                    const stage2 = offlineCtx.createBiquadFilter();
-                    stage2.type = 'highshelf';
-                    stage2.frequency.value = 2500;
-                    stage2.gain.value = 10.0;
-
-                    const gainNode = offlineCtx.createGain();
-                    gainNode.gain.value = 0.85;
-
-                    stage1.connect(stage2);
-                    stage2.connect(gainNode);
-                    entryNode = stage1;
-                    exitNode = gainNode;
+                    const s1 = offlineCtx.createBiquadFilter(); s1.type = 'highshelf'; s1.frequency.value = 375; s1.gain.value = 10.0;
+                    const s2 = offlineCtx.createBiquadFilter(); s2.type = 'highshelf'; s2.frequency.value = 2500; s2.gain.value = 10.0;
+                    const g3 = offlineCtx.createGain(); g3.gain.value = 0.85;
+                    s1.connect(s2); s2.connect(g3); entryNode = s1; exitNode = g3;
                     break;
-                }
-                default: {
-                    // Pass-through when disabled
+                default:
                     profilePrefix = "FLAT";
-                    const gainNode = offlineCtx.createGain();
-                    gainNode.gain.value = 1.0;
-                    entryNode = gainNode;
-                    exitNode = gainNode;
+                    const g0 = offlineCtx.createGain(); g0.gain.value = 1.0;
+                    entryNode = g0; exitNode = g0;
                     break;
-                }
             }
-
             return { entryNode, exitNode, profilePrefix };
         }
 
         async function exportSideWav(side) {
             initAudioContext();
             const activeTracks = state.tracks.filter(t => t.side === side);
-
             if (activeTracks.length === 0) {
-                showToast(`No tracks assigned to Side ${side} to export.`);
+                showToast(`No tracks assigned to Side ${side}.`);
                 return;
             }
 
-            const exportButtons = [
-                document.getElementById('btn-export-side-a'),
-                document.getElementById('btn-export-side-b')
-            ];
-            exportButtons.forEach(button => button.disabled = true);
+            const exportButtons = [document.getElementById('btn-export-side-a'), document.getElementById('btn-export-side-b')];
+            exportButtons.forEach(b => b.disabled = true);
 
-            showToast(`Rendering Side ${side} WAV (${state.dspProfile.toUpperCase()} DSP, ${state.speedPercent.toFixed(2)}% speed)...`);
+            showToast(`Rendering Side ${side} WAV (${state.dspProfile.toUpperCase()})...`);
 
             const rate = Math.max(0.1, 1 + (state.speedPercent / 100));
-
-            // Dynamically match export sample rate to native source buffer rate
-            const nativeSampleRate = activeTracks[0].buffer.sampleRate || (audioCtx ? audioCtx.sampleRate : 44100);
+            const nativeSampleRate = activeTracks[0].buffer.sampleRate || 44100;
             const safetyTailSeconds = 1.0;
             let currentTimeOffset = 0;
             const trackStartTimes = [];
 
             activeTracks.forEach((track, i) => {
-                // Calculate sample-rate ratio to ensure 48kHz audio buffers are perfectly converted
                 const resampleRatio = track.buffer.sampleRate / nativeSampleRate;
                 const sourceDuration = (track.buffer.duration * resampleRatio) / rate;
-
-                trackStartTimes.push({
-                    track,
-                    startTime: currentTimeOffset,
-                    sourceDuration
-                });
-
-                // Advance start offset by exact stretched duration
+                trackStartTimes.push({ track, startTime: currentTimeOffset, sourceDuration });
                 currentTimeOffset += sourceDuration;
-                if (i < activeTracks.length - 1) {
-                    currentTimeOffset += Math.max(0, state.gapSeconds);
-                }
+                if (i < activeTracks.length - 1) currentTimeOffset += Math.max(0, state.gapSeconds);
             });
 
-            // Total Offline Context duration including the safety padding
             const totalRenderDuration = currentTimeOffset + safetyTailSeconds;
 
             try {
-                const offlineCtx = new OfflineAudioContext(
-                    2,
-                    Math.max(1, Math.ceil(totalRenderDuration * nativeSampleRate)),
-                    nativeSampleRate
-                );
-
-                // 1. Build DSP Pre-Emphasis Network
+                const offlineCtx = new OfflineAudioContext(2, Math.max(1, Math.ceil(totalRenderDuration * nativeSampleRate)), nativeSampleRate);
                 const { entryNode, exitNode, profilePrefix } = setupDspProfile(offlineCtx);
 
-                // 2. Build Universal Brickwall Limiter Circuit
-                // Limiter settings: Threshold -0.5 dB, Knee 0, Ratio 20, Attack 0.003s, Release 0.05s
                 const limiter = offlineCtx.createDynamicsCompressor();
-                limiter.threshold.value = -0.5;
-                limiter.knee.value = 0;
-                limiter.ratio.value = 20;
-                limiter.attack.value = 0.003;
-                limiter.release.value = 0.05;
+                limiter.threshold.value = -0.5; limiter.knee.value = 0; limiter.ratio.value = 20;
+                limiter.attack.value = 0.003; limiter.release.value = 0.05;
 
-                // 3. Connect Processing Graph: Sources -> DSP Profile Filter(s) -> Safety Limiter -> Destination
                 exitNode.connect(limiter);
                 limiter.connect(offlineCtx.destination);
 
-                // 4. Schedule Source Nodes
                 trackStartTimes.forEach(({ track, startTime }) => {
                     const source = offlineCtx.createBufferSource();
                     source.buffer = track.buffer;
@@ -1253,7 +1098,6 @@
                     source.start(startTime);
                 });
 
-                // 5. Render Offline Context and Compile PCM output
                 const renderedBuffer = await offlineCtx.startRendering();
                 const wavBlob = audioBufferToWav(renderedBuffer);
                 const url = URL.createObjectURL(wavBlob);
@@ -1261,23 +1105,22 @@
 
                 const speedSign = state.speedPercent >= 0 ? '+' : '';
                 a.href = url;
-                a.download = `${profilePrefix}_READY_Cassette_Side_${side}_${speedSign}${state.speedPercent.toFixed(2)}percent.wav`;
+                a.download = `${profilePrefix}_Ready_Side_${side}_${speedSign}${state.speedPercent.toFixed(2)}pct.wav`;
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
 
                 setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast(`Side ${side} WAV (${profilePrefix}) exported successfully!`);
+                showToast(`Side ${side} WAV export complete!`);
             } catch (err) {
-                console.error(`Side ${side} export error:`, err);
-                showToast(`Failed to render Side ${side} WAV. Check browser console for details.`);
+                console.error("Export error:", err);
+                showToast(`Failed to render Side ${side} WAV.`);
             } finally {
-                exportButtons.forEach(button => button.disabled = false);
+                exportButtons.forEach(b => b.disabled = false);
             }
         }
 
-        // Standard 16-bit RIFF WAV Encoder Function
         function audioBufferToWav(abuffer) {
             const numOfChan = abuffer.numberOfChannels;
             const len = abuffer.length;
@@ -1285,38 +1128,16 @@
             const out = new DataView(new ArrayBuffer(length));
             let channels = [], i, sample, offset = 0, pos = 0;
 
-            function setUint16(data) {
-                out.setUint16(pos, data, true);
-                pos += 2;
-            }
+            function setUint16(data) { out.setUint16(pos, data, true); pos += 2; }
+            function setUint32(data) { out.setUint32(pos, data, true); pos += 4; }
 
-            function setUint32(data) {
-                out.setUint32(pos, data, true);
-                pos += 4;
-            }
+            setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157);
+            setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan);
+            setUint32(abuffer.sampleRate); setUint32(abuffer.sampleRate * 2 * numOfChan);
+            setUint16(numOfChan * 2); setUint16(16);
+            setUint32(0x61746164); setUint32(length - pos - 4);
 
-            // RIFF header
-            setUint32(0x46464952); // "RIFF"
-            setUint32(length - 8); // file length - 8
-            setUint32(0x45564157); // "WAVE"
-
-            // fmt chunk
-            setUint32(0x20746d66); // "fmt " chunk
-            setUint32(16); // length = 16
-            setUint16(1); // PCM format (1)
-            setUint16(numOfChan);
-            setUint32(abuffer.sampleRate);
-            setUint32(abuffer.sampleRate * 2 * numOfChan); // byte rate
-            setUint16(numOfChan * 2); // block align
-            setUint16(16); // bits per sample
-
-            // data chunk
-            setUint32(0x61746164); // "data" chunk
-            setUint32(length - pos - 4);
-
-            for (i = 0; i < abuffer.numberOfChannels; i++) {
-                channels.push(abuffer.getChannelData(i));
-            }
+            for (i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
 
             while (offset < len) {
                 for (i = 0; i < numOfChan; i++) {
@@ -1327,11 +1148,9 @@
                 }
                 offset++;
             }
-
             return new Blob([out], { type: "audio/wav" });
         }
 
-        // Initial UI Render
         updateUI();
     </script>
 </body>
