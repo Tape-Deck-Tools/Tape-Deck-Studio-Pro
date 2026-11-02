@@ -213,8 +213,8 @@
                     </label>
                     <select id="dsp-profile-select" class="w-full p-2.5 rounded text-xs font-mono bg-stone-950 text-amber-400 border border-stone-700 focus:outline-none focus:border-amber-500">
                         <option value="modern">Modern Budget Deck Profile (5kHz +4.5dB, 1.4x Gain)</option>
-                        <option value="dolby-b">Dolby B Emulation Profile (2kHz +10dB, Unity Gain)</option>
-                        <option value="dolby-c">Dolby C Emulation Profile (Cascaded 375Hz & 2.5kHz +10dB, 0.85x Gain)</option>
+                        <option value="dolby-b">Dolby B Emulation Profile (2kHz +10dB, Trimmed Gain)</option>
+                        <option value="dolby-c">Dolby C Emulation Profile (Cascaded 375Hz & 2.5kHz +10dB, Trimmed Gain)</option>
                         <option value="none">Disabled (Flat Output)</option>
                     </select>
                 </div>
@@ -993,26 +993,30 @@
         function setupAudioPipeline(offlineCtx) {
             let entryNode = null, exitNode = null, profilePrefix = "STANDARD";
 
+            // Sibilance Fix: Added dedicated attenuation stage to prevent high-frequency pre-emphasis clipping
+            const trimNode = offlineCtx.createGain();
+            trimNode.gain.value = 0.707; // -3dB headroom safeguard
+
             switch (state.dspProfile) {
                 case 'modern':
                     profilePrefix = "MODERN";
                     const f1 = offlineCtx.createBiquadFilter();
                     f1.type = 'highshelf'; f1.frequency.value = 5000; f1.gain.value = 4.5;
-                    const g1 = offlineCtx.createGain(); g1.gain.value = 1.4;
+                    const g1 = offlineCtx.createGain(); g1.gain.value = 1.0;
                     f1.connect(g1); entryNode = f1; exitNode = g1;
                     break;
                 case 'dolby-b':
                     profilePrefix = "DOLBY-B";
                     const f2 = offlineCtx.createBiquadFilter();
-                    f2.type = 'highshelf'; f2.frequency.value = 2000; f2.gain.value = 10.0;
-                    const g2 = offlineCtx.createGain(); g2.gain.value = 1.0;
+                    f2.type = 'highshelf'; f2.frequency.value = 2000; f2.gain.value = 8.0; // Reduced from +10dB to tone down harsh sibilants
+                    const g2 = offlineCtx.createGain(); g2.gain.value = 0.75;
                     f2.connect(g2); entryNode = f2; exitNode = g2;
                     break;
                 case 'dolby-c':
                     profilePrefix = "DOLBY-C";
-                    const s1 = offlineCtx.createBiquadFilter(); s1.type = 'highshelf'; s1.frequency.value = 375; s1.gain.value = 10.0;
-                    const s2 = offlineCtx.createBiquadFilter(); s2.type = 'highshelf'; s2.frequency.value = 2500; s2.gain.value = 10.0;
-                    const g3 = offlineCtx.createGain(); g3.gain.value = 0.85;
+                    const s1 = offlineCtx.createBiquadFilter(); s1.type = 'highshelf'; s1.frequency.value = 375; s1.gain.value = 7.5;
+                    const s2 = offlineCtx.createBiquadFilter(); s2.type = 'highshelf'; s2.frequency.value = 2500; s2.gain.value = 7.5;
+                    const g3 = offlineCtx.createGain(); g3.gain.value = 0.65;
                     s1.connect(s2); s2.connect(g3); entryNode = s1; exitNode = g3;
                     break;
                 default:
@@ -1031,29 +1035,30 @@
                     formulationTag = "TYPE2-CHROME";
                     formulationFilter.type = 'highshelf';
                     formulationFilter.frequency.value = 7000;
-                    formulationFilter.gain.value = 2.0;
-                    formulationGain.gain.value = 0.95;
+                    formulationFilter.gain.value = 1.5;
+                    formulationGain.gain.value = 0.90;
                     break;
                 case 'type4':
                     formulationTag = "TYPE4-METAL";
                     formulationFilter.type = 'highshelf';
                     formulationFilter.frequency.value = 10000;
                     formulationFilter.gain.value = 1.0;
-                    formulationGain.gain.value = 0.90;
+                    formulationGain.gain.value = 0.85;
                     break;
                 default:
                     formulationTag = "TYPE1-FERRIC";
                     formulationFilter.type = 'highshelf';
                     formulationFilter.frequency.value = 4000;
-                    formulationFilter.gain.value = 3.0;
-                    formulationGain.gain.value = 1.0;
+                    formulationFilter.gain.value = 2.0;
+                    formulationGain.gain.value = 0.95;
                     break;
             }
 
             exitNode.connect(formulationFilter);
             formulationFilter.connect(formulationGain);
+            formulationGain.connect(trimNode);
 
-            return { entryNode, exitNode: formulationGain, fullPrefix: `${profilePrefix}_${formulationTag}` };
+            return { entryNode, exitNode: trimNode, fullPrefix: `${profilePrefix}_${formulationTag}` };
         }
 
         async function exportSideWav(side) {
@@ -1089,12 +1094,13 @@
                 const offlineCtx = new OfflineAudioContext(2, Math.max(1, Math.ceil(totalRenderDuration * nativeSampleRate)), nativeSampleRate);
                 const { entryNode, exitNode, fullPrefix } = setupAudioPipeline(offlineCtx);
 
+                // Smoother Limiter Settings to mitigate inter-sample clipping on sharp transients
                 const limiter = offlineCtx.createDynamicsCompressor();
-                limiter.threshold.value = state.tapeFormulation === 'type4' ? -1.0 : -0.5;
-                limiter.knee.value = 0;
-                limiter.ratio.value = 20;
-                limiter.attack.value = 0.003;
-                limiter.release.value = 0.05;
+                limiter.threshold.value = -1.5;
+                limiter.knee.value = 6;
+                limiter.ratio.value = 12;
+                limiter.attack.value = 0.005;
+                limiter.release.value = 0.08;
 
                 exitNode.connect(limiter);
                 limiter.connect(offlineCtx.destination);
@@ -1133,9 +1139,25 @@
         function audioBufferToWav(abuffer) {
             const numOfChan = abuffer.numberOfChannels;
             const len = abuffer.length;
+            let channels = [], i, sample, offset = 0, pos = 0;
+
+            for (i = 0; i < numOfChan; i++) channels.push(abuffer.getChannelData(i));
+
+            // Peak detection & normalization safeguard to eliminate digital clipping crackle
+            let maxPeak = 0;
+            for (i = 0; i < numOfChan; i++) {
+                const ch = channels[i];
+                for (let k = 0; k < len; k++) {
+                    const abs = Math.abs(ch[k]);
+                    if (abs > maxPeak) maxPeak = abs;
+                }
+            }
+
+            const targetPeak = 0.96; // Normalize to -0.35 dB max limit
+            const normFactor = maxPeak > targetPeak ? targetPeak / maxPeak : 1.0;
+
             const length = len * numOfChan * 2 + 44;
             const out = new DataView(new ArrayBuffer(length));
-            let channels = [], i, sample, offset = 0, pos = 0;
 
             function setUint16(data) { out.setUint16(pos, data, true); pos += 2; }
             function setUint32(data) { out.setUint32(pos, data, true); pos += 4; }
@@ -1146,11 +1168,10 @@
             setUint16(numOfChan * 2); setUint16(16);
             setUint32(0x61746164); setUint32(length - pos - 4);
 
-            for (i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
-
             while (offset < len) {
                 for (i = 0; i < numOfChan; i++) {
-                    sample = Math.max(-1, Math.min(1, channels[i][offset]));
+                    sample = channels[i][offset] * normFactor;
+                    sample = Math.max(-1, Math.min(1, sample));
                     sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
                     out.setInt16(pos, sample, true);
                     pos += 2;
