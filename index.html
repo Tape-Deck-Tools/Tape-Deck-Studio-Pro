@@ -263,6 +263,24 @@
                     </div>
                 </div>
 
+                <!-- Stereo balance calibration imported from Tape Deck Calibration -->
+                <div class="mt-4 p-3 rounded-lg border border-amber-500/25 bg-stone-950/70 space-y-2">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400">Stereo Balance Compensation</h3>
+                        <label class="flex items-center gap-2 text-[11px] text-stone-300">
+                            <input id="balance-enabled" type="checkbox" class="accent-amber-500" checked>
+                            Enable
+                        </label>
+                    </div>
+                    <p class="text-[10px] leading-relaxed text-stone-400">Paste the correction copied from Tape Deck Calibration. This adjusts Left and Right channel gain independently during WAV export only; it does not change playback, speed, EQ, track gaps, or duration.</p>
+                    <textarea id="balance-setting" rows="2" spellcheck="false" placeholder="BALANCE_V1|L=+0.20|R=-0.20" class="w-full p-2 rounded bg-stone-900 border border-stone-700 text-xs font-mono text-amber-200 placeholder:text-stone-600 focus:outline-none focus:border-amber-500"></textarea>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="apply-balance-setting" type="button" class="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold">Apply / Save Setting</button>
+                        <button id="clear-balance-setting" type="button" class="px-3 py-2 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-semibold">Reset</button>
+                    </div>
+                    <p id="balance-setting-status" class="text-[10px] text-stone-400" aria-live="polite">No calibration setting loaded.</p>
+                </div>
+
                 <!-- Export / Download Rendered Audio -->
                 <div class="pt-2">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -987,6 +1005,83 @@
             draw();
         }
 
+        const BALANCE_STORAGE_KEY = 'tapedeck-studio-balance-v1';
+        let balanceCorrectionDb = { left: 0, right: 0 };
+
+        function parseBalanceSetting(raw) {
+            const text = String(raw || '').trim();
+            if (!text) throw new Error('Paste a calibration setting first.');
+            let left, right;
+            const compact = text.match(/BALANCE_V1\s*\|\s*L\s*=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\|\s*R\s*=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))/i);
+            if (compact) {
+                left = Number(compact[1]);
+                right = Number(compact[2]);
+            } else {
+                const lMatch = text.match(/L(?:eft)?\s*[:=]?\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*dB?/i);
+                const rMatch = text.match(/R(?:ight)?\s*[:=]?\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*dB?/i);
+                if (!lMatch || !rMatch) throw new Error('Unrecognized format. Copy the setting directly from Tape Deck Calibration.');
+                left = Number(lMatch[1]);
+                right = Number(rMatch[1]);
+            }
+            if (!Number.isFinite(left) || !Number.isFinite(right) || Math.abs(left) > 12 || Math.abs(right) > 12) {
+                throw new Error('Correction values must be between -12 and +12 dB.');
+            }
+            return { left, right };
+        }
+
+        function updateBalanceStatus(message, good = false) {
+            const el = document.getElementById('balance-setting-status');
+            el.textContent = message;
+            el.className = 'text-[10px] ' + (good ? 'text-emerald-400' : 'text-stone-400');
+        }
+
+        function applyBalanceSetting() {
+            const raw = document.getElementById('balance-setting').value;
+            try {
+                balanceCorrectionDb = parseBalanceSetting(raw);
+                const enabled = document.getElementById('balance-enabled').checked;
+                localStorage.setItem(BALANCE_STORAGE_KEY, JSON.stringify({
+                    raw, enabled, left: balanceCorrectionDb.left, right: balanceCorrectionDb.right
+                }));
+                updateBalanceStatus(`Saved · Left ${balanceCorrectionDb.left >= 0 ? '+' : ''}${balanceCorrectionDb.left.toFixed(2)} dB / Right ${balanceCorrectionDb.right >= 0 ? '+' : ''}${balanceCorrectionDb.right.toFixed(2)} dB${enabled ? ' · active on export' : ' · currently disabled'}`, true);
+            } catch (err) {
+                updateBalanceStatus(err.message, false);
+            }
+        }
+
+        function loadBalanceSetting() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(BALANCE_STORAGE_KEY) || 'null');
+                if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.right)) {
+                    balanceCorrectionDb = { left: saved.left, right: saved.right };
+                    document.getElementById('balance-setting').value = saved.raw || `BALANCE_V1|L=${saved.left}|R=${saved.right}`;
+                    document.getElementById('balance-enabled').checked = saved.enabled !== false;
+                    updateBalanceStatus(`Loaded · Left ${saved.left >= 0 ? '+' : ''}${saved.left.toFixed(2)} dB / Right ${saved.right >= 0 ? '+' : ''}${saved.right.toFixed(2)} dB${saved.enabled === false ? ' · disabled' : ' · active on export'}`, true);
+                }
+            } catch (_) {}
+        }
+
+        document.getElementById('apply-balance-setting').addEventListener('click', applyBalanceSetting);
+        document.getElementById('balance-enabled').addEventListener('change', () => {
+            try {
+                const saved = JSON.parse(localStorage.getItem(BALANCE_STORAGE_KEY) || 'null') || {};
+                saved.enabled = document.getElementById('balance-enabled').checked;
+                saved.left = balanceCorrectionDb.left;
+                saved.right = balanceCorrectionDb.right;
+                saved.raw = document.getElementById('balance-setting').value;
+                localStorage.setItem(BALANCE_STORAGE_KEY, JSON.stringify(saved));
+                updateBalanceStatus(`Setting ${saved.enabled ? 'enabled' : 'disabled'} for WAV export.`, true);
+            } catch (_) {}
+        });
+        document.getElementById('clear-balance-setting').addEventListener('click', () => {
+            balanceCorrectionDb = { left: 0, right: 0 };
+            document.getElementById('balance-setting').value = '';
+            document.getElementById('balance-enabled').checked = false;
+            localStorage.removeItem(BALANCE_STORAGE_KEY);
+            updateBalanceStatus('Calibration cleared. No channel compensation will be applied.');
+        });
+        loadBalanceSetting();
+
         document.getElementById('btn-export-side-a').addEventListener('click', () => exportSideWav('A'));
         document.getElementById('btn-export-side-b').addEventListener('click', () => exportSideWav('B'));
 
@@ -1102,7 +1197,23 @@
                 limiter.attack.value = 0.005;
                 limiter.release.value = 0.08;
 
-                exitNode.connect(limiter);
+                const balanceEnabled = document.getElementById('balance-enabled').checked;
+                if (balanceEnabled && (balanceCorrectionDb.left !== 0 || balanceCorrectionDb.right !== 0)) {
+                    const splitter = offlineCtx.createChannelSplitter(2);
+                    const merger = offlineCtx.createChannelMerger(2);
+                    const leftTrim = offlineCtx.createGain();
+                    const rightTrim = offlineCtx.createGain();
+                    leftTrim.gain.value = Math.pow(10, balanceCorrectionDb.left / 20);
+                    rightTrim.gain.value = Math.pow(10, balanceCorrectionDb.right / 20);
+                    exitNode.connect(splitter);
+                    splitter.connect(leftTrim, 0);
+                    splitter.connect(rightTrim, 1);
+                    leftTrim.connect(merger, 0, 0);
+                    rightTrim.connect(merger, 0, 1);
+                    merger.connect(limiter);
+                } else {
+                    exitNode.connect(limiter);
+                }
                 limiter.connect(offlineCtx.destination);
 
                 trackStartTimes.forEach(({ track, startTime }) => {
