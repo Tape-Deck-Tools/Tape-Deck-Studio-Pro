@@ -1007,6 +1007,19 @@
 
         const BALANCE_STORAGE_KEY = 'tapedeck-studio-balance-v1';
         let balanceCorrectionDb = { left: 0, right: 0 };
+        let balanceAppliedRaw = '';
+        let balanceHasApplied = false;
+
+        function persistBalance(enabled) {
+            try {
+                localStorage.setItem(BALANCE_STORAGE_KEY, JSON.stringify({
+                    raw: balanceAppliedRaw, enabled, left: balanceCorrectionDb.left, right: balanceCorrectionDb.right
+                }));
+                // Read back to confirm it truly persisted
+                const check = JSON.parse(localStorage.getItem(BALANCE_STORAGE_KEY) || 'null');
+                return !!(check && check.left === balanceCorrectionDb.left && check.right === balanceCorrectionDb.right);
+            } catch (_) { return false; }
+        }
 
         function parseBalanceSetting(raw) {
             const text = String(raw || '').trim();
@@ -1037,15 +1050,23 @@
 
         function applyBalanceSetting() {
             const raw = document.getElementById('balance-setting').value;
+            let parsed;
             try {
-                balanceCorrectionDb = parseBalanceSetting(raw);
-                const enabled = document.getElementById('balance-enabled').checked;
-                localStorage.setItem(BALANCE_STORAGE_KEY, JSON.stringify({
-                    raw, enabled, left: balanceCorrectionDb.left, right: balanceCorrectionDb.right
-                }));
-                updateBalanceStatus(`Saved · Left ${balanceCorrectionDb.left >= 0 ? '+' : ''}${balanceCorrectionDb.left.toFixed(2)} dB / Right ${balanceCorrectionDb.right >= 0 ? '+' : ''}${balanceCorrectionDb.right.toFixed(2)} dB${enabled ? ' · active on export' : ' · currently disabled'}`, true);
+                parsed = parseBalanceSetting(raw);
             } catch (err) {
                 updateBalanceStatus(err.message, false);
+                return;
+            }
+            balanceCorrectionDb = parsed;
+            balanceAppliedRaw = raw;
+            balanceHasApplied = true;
+            const enabled = document.getElementById('balance-enabled').checked;
+            const saved = persistBalance(enabled);
+            const summary = `Left ${parsed.left >= 0 ? '+' : ''}${parsed.left.toFixed(2)} dB / Right ${parsed.right >= 0 ? '+' : ''}${parsed.right.toFixed(2)} dB${enabled ? ' · active on export' : ' · currently disabled (tick Enable)'}`;
+            if (saved) {
+                updateBalanceStatus(`Saved · ${summary}`, true);
+            } else {
+                updateBalanceStatus(`Applied for this session only (browser blocked saving) · ${summary}`, false);
             }
         }
 
@@ -1054,6 +1075,8 @@
                 const saved = JSON.parse(localStorage.getItem(BALANCE_STORAGE_KEY) || 'null');
                 if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.right)) {
                     balanceCorrectionDb = { left: saved.left, right: saved.right };
+                    balanceAppliedRaw = saved.raw || `BALANCE_V1|L=${saved.left}|R=${saved.right}`;
+                    balanceHasApplied = true;
                     document.getElementById('balance-setting').value = saved.raw || `BALANCE_V1|L=${saved.left}|R=${saved.right}`;
                     document.getElementById('balance-enabled').checked = saved.enabled !== false;
                     updateBalanceStatus(`Loaded · Left ${saved.left >= 0 ? '+' : ''}${saved.left.toFixed(2)} dB / Right ${saved.right >= 0 ? '+' : ''}${saved.right.toFixed(2)} dB${saved.enabled === false ? ' · disabled' : ' · active on export'}`, true);
@@ -1063,21 +1086,21 @@
 
         document.getElementById('apply-balance-setting').addEventListener('click', applyBalanceSetting);
         document.getElementById('balance-enabled').addEventListener('change', () => {
-            try {
-                const saved = JSON.parse(localStorage.getItem(BALANCE_STORAGE_KEY) || 'null') || {};
-                saved.enabled = document.getElementById('balance-enabled').checked;
-                saved.left = balanceCorrectionDb.left;
-                saved.right = balanceCorrectionDb.right;
-                saved.raw = document.getElementById('balance-setting').value;
-                localStorage.setItem(BALANCE_STORAGE_KEY, JSON.stringify(saved));
-                updateBalanceStatus(`Setting ${saved.enabled ? 'enabled' : 'disabled'} for WAV export.`, true);
-            } catch (_) {}
+            const enabled = document.getElementById('balance-enabled').checked;
+            if (!balanceHasApplied) {
+                updateBalanceStatus(enabled ? 'Enabled. Paste a setting and press Apply / Save.' : 'Disabled. No channel compensation will be applied.');
+                return;
+            }
+            const saved = persistBalance(enabled);
+            updateBalanceStatus(`Setting ${enabled ? 'enabled' : 'disabled'} for WAV export${saved ? '.' : ' (this session only; browser blocked saving).'}`, saved);
         });
         document.getElementById('clear-balance-setting').addEventListener('click', () => {
             balanceCorrectionDb = { left: 0, right: 0 };
+            balanceAppliedRaw = '';
+            balanceHasApplied = false;
             document.getElementById('balance-setting').value = '';
-            document.getElementById('balance-enabled').checked = false;
-            localStorage.removeItem(BALANCE_STORAGE_KEY);
+            document.getElementById('balance-enabled').checked = true;
+            try { localStorage.removeItem(BALANCE_STORAGE_KEY); } catch (_) {}
             updateBalanceStatus('Calibration cleared. No channel compensation will be applied.');
         });
         loadBalanceSetting();
