@@ -275,8 +275,13 @@
                     <p class="text-[10px] leading-relaxed text-stone-400">Paste the correction copied from Tape Deck Calibration. This adjusts Left and Right channel gain independently during WAV export only; it does not change playback, speed, EQ, track gaps, or duration.</p>
                     <textarea id="balance-setting" rows="2" spellcheck="false" placeholder="BALANCE_V1|L=+0.20|R=-0.20" class="w-full p-2 rounded bg-stone-900 border border-stone-700 text-xs font-mono text-amber-200 placeholder:text-stone-600 focus:outline-none focus:border-amber-500"></textarea>
                     <div class="flex flex-wrap gap-2">
-                        <button id="apply-balance-setting" type="button" class="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold">Apply / Save Setting</button>
+                        <button id="apply-balance-setting" type="button" class="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold">Apply Initial Setting</button>
                         <button id="clear-balance-setting" type="button" class="px-3 py-2 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-semibold">Reset</button>
+                    </div>
+                    <div class="pt-2 mt-1 border-t border-stone-800 space-y-2">
+                        <p class="text-[10px] leading-relaxed text-stone-400"><span class="font-bold text-amber-400">Fine-tune:</span> after the initial setting is applied, run calibration again and paste the new adjustment here. It is added (in dB, per channel) to the current setting above.</p>
+                        <textarea id="balance-update-setting" rows="1" spellcheck="false" placeholder="BALANCE_V1|L=-1.12|R=+1.12" class="w-full p-2 rounded bg-stone-900 border border-stone-700 text-xs font-mono text-amber-200 placeholder:text-stone-600 focus:outline-none focus:border-amber-500"></textarea>
+                        <button id="apply-balance-update" type="button" class="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold">Add Update to Current Setting</button>
                     </div>
                     <p id="balance-setting-status" class="text-[10px] text-stone-400" aria-live="polite">No calibration setting loaded.</p>
                 </div>
@@ -1084,7 +1089,40 @@
             } catch (_) {}
         }
 
+        function fmtDb(v) { return (v >= 0 ? '+' : '') + v.toFixed(2); }
+
+        function applyBalanceUpdate() {
+            const box = document.getElementById('balance-update-setting');
+            if (!balanceHasApplied) {
+                updateBalanceStatus('Apply the initial setting first, then add updates.', false);
+                return;
+            }
+            let adj;
+            try {
+                adj = parseBalanceSetting(box.value);
+            } catch (err) {
+                updateBalanceStatus(err.message, false);
+                return;
+            }
+            const round2 = (v) => Math.round(v * 100) / 100;
+            const prev = { ...balanceCorrectionDb };
+            const combined = { left: round2(prev.left + adj.left), right: round2(prev.right + adj.right) };
+            if (Math.abs(combined.left) > 12 || Math.abs(combined.right) > 12) {
+                updateBalanceStatus(`Combined result (L ${fmtDb(combined.left)} / R ${fmtDb(combined.right)} dB) is outside the ±12 dB limit. Nothing changed.`, false);
+                return;
+            }
+            balanceCorrectionDb = combined;
+            balanceAppliedRaw = `BALANCE_V1|L=${fmtDb(combined.left)}|R=${fmtDb(combined.right)}`;
+            document.getElementById('balance-setting').value = balanceAppliedRaw;
+            box.value = '';
+            const enabled = document.getElementById('balance-enabled').checked;
+            const saved = persistBalance(enabled);
+            const summary = `Was L ${fmtDb(prev.left)} / R ${fmtDb(prev.right)} · adjustment L ${fmtDb(adj.left)} / R ${fmtDb(adj.right)} · now L ${fmtDb(combined.left)} / R ${fmtDb(combined.right)} dB${enabled ? ' · active on export' : ' · currently disabled (tick Enable)'}`;
+            updateBalanceStatus(saved ? `Updated & saved · ${summary}` : `Updated for this session only (browser blocked saving) · ${summary}`, saved);
+        }
+
         document.getElementById('apply-balance-setting').addEventListener('click', applyBalanceSetting);
+        document.getElementById('apply-balance-update').addEventListener('click', applyBalanceUpdate);
         document.getElementById('balance-enabled').addEventListener('change', () => {
             const enabled = document.getElementById('balance-enabled').checked;
             if (!balanceHasApplied) {
@@ -1099,6 +1137,7 @@
             balanceAppliedRaw = '';
             balanceHasApplied = false;
             document.getElementById('balance-setting').value = '';
+            document.getElementById('balance-update-setting').value = '';
             document.getElementById('balance-enabled').checked = true;
             try { localStorage.removeItem(BALANCE_STORAGE_KEY); } catch (_) {}
             updateBalanceStatus('Calibration cleared. No channel compensation will be applied.');
