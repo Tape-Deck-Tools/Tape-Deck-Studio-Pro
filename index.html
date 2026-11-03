@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TapeDeck Studio Pro - Cassette Layout & Speed Optimizer</title>
+    <meta name="description" content="Cassette Layout, Speed Optimizer & Profile-Based Noise Cancellation DSP for analog music recording." />
+    <meta property="og:title" content="TapeDeck Studio Pro" />
+    <meta property="og:description" content="Cassette Layout, Speed Optimizer & Profile-Based Noise Cancellation DSP for analog music recording." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -12,6 +17,9 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    screens: {
+                        'xs': '440px'
+                    },
                     colors: {
                         tape: {
                             base: '#1e1c19',
@@ -30,6 +38,15 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
         
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #0c0a09;
@@ -63,24 +80,24 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-stone-950 text-stone-100 flex flex-col">
+<body class="min-h-screen bg-stone-950 text-stone-100 flex flex-col antialiased">
 
     <!-- Header -->
     <header class="bg-stone-900 border-b border-stone-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <div class="flex items-center space-x-2.5">
-                <div class="p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500">
-                    <i class="fa-solid fa-tape text-lg sm:text-xl"></i>
+            <div class="flex items-center space-x-2 sm:space-x-2.5 min-w-0">
+                <div class="p-1.5 sm:p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500 flex-shrink-0">
+                    <i class="fa-solid fa-tape text-base sm:text-xl"></i>
                 </div>
-                <div>
-                    <h1 class="font-bold text-sm sm:text-base md:text-lg text-amber-400 tracking-wide">TapeDeck Studio Pro</h1>
-                    <p class="text-[10px] sm:text-xs text-stone-400">Analog Calibration & Optimizer</p>
+                <div class="min-w-0">
+                    <h1 class="font-bold text-sm sm:text-base md:text-lg text-amber-400 tracking-wide truncate">TapeDeck Studio Pro</h1>
+                    <p class="text-[10px] sm:text-xs text-stone-400 truncate">Analog Calibration & Optimizer</p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2">
-                <label class="cursor-pointer bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center shadow-lg shadow-amber-600/20 active:scale-95">
-                    <i class="fa-solid fa-plus mr-1.5"></i> <span class="hidden xs:inline">Add Tracks</span><span class="inline xs:hidden">Add</span>
+            <div class="flex items-center space-x-2 flex-shrink-0 ml-2">
+                <label class="cursor-pointer bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center shadow-lg shadow-amber-600/20 active:scale-95">
+                    <i class="fa-solid fa-plus sm:mr-1.5"></i> <span class="hidden sm:inline">Add Tracks</span><span class="inline sm:hidden ml-1">Add</span>
                     <input type="file" id="audio-input" multiple accept="audio/*" class="hidden">
                 </label>
             </div>
@@ -116,45 +133,45 @@
                 </div>
 
                 <!-- Cassette Shell Canvas/Graphic -->
-                <div class="relative bg-stone-950 border-2 border-stone-800 rounded-lg p-3 sm:p-4 flex flex-col items-center justify-between shadow-inner h-52 sm:h-56">
-                    <div class="w-full bg-amber-100/90 text-stone-900 p-2 rounded flex justify-between items-center shadow-sm text-xs font-bold mb-2">
-                        <div class="flex items-center space-x-2 truncate pr-1">
+                <div class="relative bg-stone-950 border-2 border-stone-800 rounded-lg p-2.5 sm:p-4 flex flex-col items-center justify-between shadow-inner h-48 sm:h-56">
+                    <div class="w-full bg-amber-100/90 text-stone-900 p-2 rounded flex justify-between items-center shadow-sm text-xs font-bold mb-1.5 sm:mb-2">
+                        <div class="flex items-center space-x-2 truncate pr-1 min-w-0">
                             <span class="bg-stone-900 text-amber-400 px-1.5 py-0.5 rounded text-[10px] sm:text-xs flex-shrink-0" id="active-side-badge">SIDE A</span>
                             <span class="truncate" id="current-tape-title">Custom Mixtape</span>
                         </div>
-                        <div class="text-right font-mono text-stone-700 flex-shrink-0 text-xs">
+                        <div class="text-right font-mono text-stone-700 flex-shrink-0 text-xs ml-1">
                             C-<span id="tape-type-label">60</span>
                         </div>
                     </div>
 
-                    <div class="relative w-full h-24 sm:h-28 bg-stone-900/90 border border-stone-800 rounded-md p-2 flex items-center justify-around overflow-hidden">
-                        <div class="absolute inset-x-6 sm:inset-x-8 top-3 bottom-3 bg-amber-950/20 rounded-full border border-amber-900/30 flex items-center justify-between px-4 sm:px-6 pointer-events-none">
-                            <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
-                                <div id="left-reel-hub" class="w-8 h-8 sm:w-10 sm:h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
-                                    <div class="w-2 h-2 bg-stone-400 rounded-full"></div>
+                    <div class="relative w-full h-20 sm:h-28 bg-stone-900/90 border border-stone-800 rounded-md p-1.5 sm:p-2 flex items-center justify-around overflow-hidden">
+                        <div class="absolute inset-x-2 xs:inset-x-4 sm:inset-x-8 top-2 bottom-2 sm:top-3 sm:bottom-3 bg-amber-950/20 rounded-full border border-amber-900/30 flex items-center justify-between px-2 sm:px-6 pointer-events-none">
+                            <div class="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 sm:border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
+                                <div id="left-reel-hub" class="w-7 h-7 sm:w-10 sm:h-10 border sm:border-2 border-amber-500/80 rounded-full flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-stone-400 rounded-full"></div>
                                 </div>
                             </div>
-                            <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
-                                <div id="right-reel-hub" class="w-8 h-8 sm:w-10 sm:h-10 border-2 border-amber-500/80 rounded-full flex items-center justify-center">
-                                    <div class="w-2 h-2 bg-stone-400 rounded-full"></div>
+                            <div class="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 sm:border-4 border-amber-700/50 bg-stone-950 flex items-center justify-center">
+                                <div id="right-reel-hub" class="w-7 h-7 sm:w-10 sm:h-10 border sm:border-2 border-amber-500/80 rounded-full flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-stone-400 rounded-full"></div>
                                 </div>
                             </div>
                         </div>
-                        <canvas id="deck-visualizer" class="w-full h-full opacity-60 z-10 pointer-events-none"></canvas>
+                        <canvas id="deck-visualizer" class="w-full h-full opacity-60 z-10 pointer-events-none block"></canvas>
                     </div>
 
-                    <div class="w-full flex items-center justify-between mt-3 pt-2 border-t border-stone-800/80">
-                        <div class="font-mono text-base sm:text-xl text-amber-500 tracking-wider font-bold bg-black/60 px-2.5 sm:px-3 py-1 rounded border border-amber-500/20" id="deck-timer">
+                    <div class="w-full flex items-center justify-between mt-2 sm:mt-3 pt-2 border-t border-stone-800/80">
+                        <div class="font-mono text-sm sm:text-xl text-amber-500 tracking-wider font-bold bg-black/60 px-2 sm:px-3 py-1 rounded border border-amber-500/20" id="deck-timer">
                             00:00.0
                         </div>
                         <div class="flex items-center space-x-1.5 sm:space-x-2">
-                            <button id="btn-prev" class="p-2 sm:px-3 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-xs sm:text-sm active:scale-95" aria-label="Previous track">
+                            <button id="btn-prev" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-xs sm:text-sm active:scale-95" aria-label="Previous track">
                                 <i class="fa-solid fa-backward-step"></i>
                             </button>
-                            <button id="btn-play" class="px-3 sm:px-4 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded transition text-xs sm:text-sm flex items-center shadow active:scale-95">
+                            <button id="btn-play" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded transition text-xs sm:text-sm flex items-center shadow active:scale-95">
                                 <i class="fa-solid fa-play mr-1"></i> Play
                             </button>
-                            <button id="btn-next" class="p-2 sm:px-3 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-xs sm:text-sm active:scale-95" aria-label="Next track">
+                            <button id="btn-next" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 transition text-xs sm:text-sm active:scale-95" aria-label="Next track">
                                 <i class="fa-solid fa-forward-step"></i>
                             </button>
                         </div>
@@ -162,8 +179,184 @@
                 </div>
             </div>
 
+            <!-- Cassette Hum & Noise Profile Cancellation -->
+            <div id="noise-cancellation-card" class="bg-stone-900 border border-stone-800 rounded-xl p-3.5 sm:p-5 space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 border-b border-stone-800 pb-3">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <div class="p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500 flex-shrink-0">
+                            <i class="fa-solid fa-wave-square text-base"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center space-x-2 flex-wrap">
+                                <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-400">
+                                    Cassette Hum & Noise Cancellation
+                                </h2>
+                                <span class="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-mono bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                                    Music Safe DSP
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-stone-400 truncate">
+                                Subtracts tape hiss & hum using your cassette silence sample
+                            </p>
+                        </div>
+                    </div>
+                    <label class="flex items-center space-x-2 cursor-pointer bg-stone-950 px-2.5 py-1.5 rounded-lg border border-stone-800 hover:border-stone-700 flex-shrink-0 self-end sm:self-auto">
+                        <input type="checkbox" id="denoise-enabled" class="accent-amber-500 w-4 h-4 cursor-pointer" checked>
+                        <span class="text-xs font-bold text-stone-200" id="denoise-toggle-label">Active</span>
+                    </label>
+                </div>
+
+                <!-- Noise Sample Upload & Sampling -->
+                <div class="space-y-2.5">
+                    <label class="block text-xs font-semibold text-stone-400">
+                        1. Provide Cassette Noise Sample (Record silent tape on your deck)
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <label class="border-2 border-dashed border-stone-700 hover:border-amber-500 bg-stone-950/60 hover:bg-stone-950 transition-all rounded-lg p-3 text-center cursor-pointer flex flex-col items-center justify-center group">
+                            <input type="file" id="noise-sample-input" accept="audio/*" class="hidden">
+                            <i class="fa-solid fa-upload text-amber-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs font-bold text-stone-200">Upload Noise Recording</span>
+                            <span class="text-[10px] text-stone-500">WAV, MP3, FLAC (3-10s of blank tape)</span>
+                        </label>
+                        <button id="btn-sample-linein" type="button" class="border border-stone-700 hover:border-amber-500 bg-stone-950/60 hover:bg-stone-950 transition-all rounded-lg p-3 text-center flex flex-col items-center justify-center relative overflow-hidden group active:scale-95">
+                            <div id="sample-record-bar" class="absolute inset-y-0 left-0 bg-red-500/20 transition-all duration-100" style="width: 0%;"></div>
+                            <i id="sample-record-icon" class="fa-solid fa-microphone text-amber-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs font-bold text-stone-200" id="sample-record-label">Sample From Line-In / Mic</span>
+                            <span class="text-[10px] text-stone-500" id="sample-record-sub">4-second live calibration</span>
+                        </button>
+                    </div>
+
+                    <!-- Presets -->
+                    <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                        <span class="text-[11px] text-stone-500 mr-1 w-full sm:w-auto">Calibrated Presets:</span>
+                        <button type="button" class="noise-preset-btn flex-1 sm:flex-none text-center px-2 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded text-[10px] font-mono transition border border-stone-700 active:scale-95" data-preset="60hz_us">
+                            60Hz US Ground Hum
+                        </button>
+                        <button type="button" class="noise-preset-btn flex-1 sm:flex-none text-center px-2 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded text-[10px] font-mono transition border border-stone-700 active:scale-95" data-preset="50hz_eu">
+                            50Hz EU Transformer
+                        </button>
+                        <button type="button" class="noise-preset-btn flex-1 sm:flex-none text-center px-2 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded text-[10px] font-mono transition border border-stone-700 active:scale-95" data-preset="type1_ferric">
+                            Type I High Hiss
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Profile Fingerprint & Spectrum -->
+                <div id="noise-profile-card" class="bg-stone-950 border border-stone-800 rounded-lg p-3 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center space-x-2 truncate min-w-0">
+                            <i class="fa-solid fa-circle-check text-emerald-400 text-sm flex-shrink-0"></i>
+                            <div class="truncate min-w-0">
+                                <span class="text-xs font-bold text-amber-200 block truncate" id="profile-name-display">
+                                    60Hz US Ground Hum & Hiss (Calibrated)
+                                </span>
+                                <span class="text-[10px] font-mono text-stone-400 block truncate" id="profile-sub-display">
+                                    5.0s sample · 44100 Hz · 2048-pt FFT
+                                </span>
+                            </div>
+                        </div>
+                        <button id="btn-clear-noise" type="button" class="p-1 text-stone-500 hover:text-stone-300 rounded text-xs transition flex-shrink-0" title="Clear profile">
+                            <i class="fa-solid fa-arrow-rotate-left"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2 text-center">
+                        <div class="bg-stone-900 border border-stone-800 rounded p-1.5">
+                            <span class="block text-[9px] uppercase tracking-wider text-stone-400 truncate">Detected Hum</span>
+                            <span class="text-[11px] sm:text-xs font-mono font-bold text-amber-400" id="profile-hum-display">60.0 Hz</span>
+                        </div>
+                        <div class="bg-stone-900 border border-stone-800 rounded p-1.5">
+                            <span class="block text-[9px] uppercase tracking-wider text-stone-400 truncate">Noise Floor</span>
+                            <span class="text-[11px] sm:text-xs font-mono font-bold text-amber-400" id="profile-rms-display">-46.5 dBFS</span>
+                        </div>
+                        <div class="bg-stone-900 border border-stone-800 rounded p-1.5">
+                            <span class="block text-[9px] uppercase tracking-wider text-stone-400 truncate">Hum Strength</span>
+                            <span class="text-[11px] sm:text-xs font-mono font-bold text-amber-400" id="profile-spike-display">+18.5 dB</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center text-[10px] font-mono text-stone-400">
+                            <span>Noise Spectrum (20 Hz - 20 kHz)</span>
+                            <span class="text-amber-500">● Fingerprint</span>
+                        </div>
+                        <div class="relative w-full h-24 bg-stone-900 rounded border border-stone-800 overflow-hidden">
+                            <canvas id="noise-spectrum-canvas" class="w-full h-full block"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Music Protection & Reduction Controls -->
+                <div class="space-y-3 pt-2 border-t border-stone-800">
+                    <label class="block text-xs font-semibold text-stone-400">
+                        2. Music Protection & Tuning
+                    </label>
+
+                    <!-- Presets -->
+                    <div class="grid grid-cols-3 gap-1 sm:gap-1.5">
+                        <button type="button" class="denoise-mode-btn py-1.5 px-0.5 sm:px-1 rounded text-[10px] sm:text-xs font-mono border border-stone-800 bg-stone-950 text-stone-400 hover:text-stone-200 text-center" data-mode="transparent">
+                            <span class="hidden sm:inline">Transparent (-8dB)</span>
+                            <span class="sm:hidden">Light (-8dB)</span>
+                        </button>
+                        <button type="button" class="denoise-mode-btn py-1.5 px-0.5 sm:px-1 rounded text-[10px] sm:text-xs font-mono border border-amber-500 bg-amber-500/20 text-amber-300 font-bold text-center" data-mode="balanced">
+                            <span class="hidden sm:inline">Balanced (-12dB)</span>
+                            <span class="sm:hidden">Bal. (-12dB)</span>
+                        </button>
+                        <button type="button" class="denoise-mode-btn py-1.5 px-0.5 sm:px-1 rounded text-[10px] sm:text-xs font-mono border border-stone-800 bg-stone-950 text-stone-400 hover:text-stone-200 text-center" data-mode="aggressive">
+                            <span class="hidden sm:inline">Deep Clean (-18dB)</span>
+                            <span class="sm:hidden">Deep (-18dB)</span>
+                        </button>
+                    </div>
+
+                    <!-- Reduction Slider -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1 text-xs">
+                            <span class="text-stone-400">Noise Reduction Amount:</span>
+                            <span id="denoise-reduction-val" class="font-mono text-amber-400 font-bold">-12.0 dB</span>
+                        </div>
+                        <input type="range" id="denoise-reduction-slider" min="3" max="24" step="0.5" value="12" class="w-full accent-amber-500 bg-stone-800 rounded py-1 cursor-pointer">
+                    </div>
+
+                    <!-- Band Focus -->
+                    <div>
+                        <label class="block text-[11px] text-stone-400 mb-1">Target Frequency Band</label>
+                        <div class="grid grid-cols-3 gap-1 sm:gap-1.5">
+                            <button type="button" class="denoise-band-btn py-1.5 px-0.5 sm:px-1 rounded text-[10px] sm:text-[11px] font-mono border border-amber-500 bg-amber-500/20 text-amber-300 font-bold text-center" data-band="all">
+                                Full Spectrum
+                            </button>
+                            <button type="button" class="denoise-band-btn py-1.5 px-0.5 sm:px-1 rounded text-[10px] sm:text-[11px] font-mono border border-stone-800 bg-stone-950 text-stone-400 hover:text-stone-200 text-center" data-band="hum_only">
+                                <span class="hidden sm:inline">Hum Only (&lt;800Hz)</span>
+                                <span class="sm:hidden">Hum (&lt;800Hz)</span>
+                            </button>
+                            <button type="button" class="denoise-band-btn py-1.5 px-0.5 sm:px-1 rounded text-[10px] sm:text-[11px] font-mono border border-stone-800 bg-stone-950 text-stone-400 hover:text-stone-200 text-center" data-band="hiss_only">
+                                <span class="hidden sm:inline">Hiss Only (&gt;1.5kHz)</span>
+                                <span class="sm:hidden">Hiss (&gt;1.5k)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Safeguards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <label class="flex items-start space-x-2 bg-stone-950 p-2 rounded border border-stone-800 cursor-pointer">
+                            <input type="checkbox" id="denoise-hum-comb" class="accent-amber-500 w-4 h-4 rounded cursor-pointer mt-0.5" checked>
+                            <div>
+                                <span class="font-semibold text-stone-200 block text-[11px]">Harmonic Comb Filter</span>
+                                <span class="text-[9px] text-stone-400 block leading-tight">Surgically notches 60Hz/120Hz/180Hz</span>
+                            </div>
+                        </label>
+                        <div class="bg-stone-950 p-2 rounded border border-stone-800 space-y-1">
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span class="text-stone-300">Spectral Floor:</span>
+                                <span id="denoise-floor-val" class="font-mono text-amber-400 font-bold">-16 dB</span>
+                            </div>
+                            <input type="range" id="denoise-floor-slider" min="-24" max="-10" step="1" value="-16" class="w-full accent-amber-500 bg-stone-800 rounded py-0.5 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Tape Capacity, Formulation & Speed Calibration Controls -->
-            <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 sm:p-5 space-y-4 sm:space-y-5">
+            <div class="bg-stone-900 border border-stone-800 rounded-xl p-3.5 sm:p-5 space-y-4 sm:space-y-5">
                 <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center">
                     <i class="fa-solid fa-sliders mr-2"></i> Tape Deck & Capacity Settings
                 </h2>
@@ -189,7 +382,7 @@
                         <label class="text-xs font-semibold text-stone-400">Inter-Track Silent Gap</label>
                         <span id="gap-val-display" class="text-xs font-mono text-amber-400">2.0s</span>
                     </div>
-                    <input type="range" id="gap-slider" min="0" max="10" step="0.5" value="2.0" class="w-full accent-amber-500 bg-stone-800 rounded py-1">
+                    <input type="range" id="gap-slider" min="0" max="10" step="0.5" value="2.0" class="w-full accent-amber-500 bg-stone-800 rounded py-1 cursor-pointer">
                 </div>
 
                 <!-- Tape Formulation / Bias Type Selector -->
@@ -236,7 +429,7 @@
                         Compensates for motor speed drift. Alters playback and export duration/pitch.
                     </p>
 
-                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3">
+                    <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-3 xl:grid-cols-6 gap-1.5 sm:gap-2 mb-3">
                         <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" data-speed="0">0% (1.0x)</button>
                         <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-amber-500 bg-amber-500/20 text-amber-400 font-bold active:scale-95" data-speed="-5.75">-5.75%</button>
                         <button class="speed-btn py-2 px-1 rounded text-[11px] sm:text-xs font-mono border border-stone-700 bg-stone-800 text-stone-300 hover:border-amber-500 active:scale-95" data-speed="-2.5">-2.5%</button>
@@ -265,42 +458,25 @@
 
                 <!-- Stereo balance calibration imported from Tape Deck Calibration -->
                 <div class="mt-4 p-3 rounded-lg border border-amber-500/25 bg-stone-950/70 space-y-2">
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center justify-between gap-3 flex-wrap">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400">Stereo Balance Compensation</h3>
-                        <label class="flex items-center gap-2 text-[11px] text-stone-300">
+                        <label class="flex items-center gap-2 text-[11px] text-stone-300 cursor-pointer">
                             <input id="balance-enabled" type="checkbox" class="accent-amber-500" checked>
                             Enable
                         </label>
                     </div>
-                    <p class="text-[10px] leading-relaxed text-stone-400">Paste the correction copied from Tape Deck Calibration. This adjusts Left and Right channel gain independently during WAV export only; it does not change playback, speed, EQ, track gaps, or duration.</p>
+                    <p class="text-[10px] leading-relaxed text-stone-400">Paste the correction copied from Tape Deck Calibration. Adjusts Left & Right gain during WAV export only.</p>
                     <textarea id="balance-setting" rows="2" spellcheck="false" placeholder="BALANCE_V1|L=+0.20|R=-0.20" class="w-full p-2 rounded bg-stone-900 border border-stone-700 text-xs font-mono text-amber-200 placeholder:text-stone-600 focus:outline-none focus:border-amber-500"></textarea>
                     <div class="flex flex-wrap gap-2">
-                        <button id="apply-balance-setting" type="button" class="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold">Apply Initial Setting</button>
-                        <button id="clear-balance-setting" type="button" class="px-3 py-2 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-semibold">Reset</button>
+                        <button id="apply-balance-setting" type="button" class="flex-1 sm:flex-none px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold text-center active:scale-95">Apply Initial Setting</button>
+                        <button id="clear-balance-setting" type="button" class="px-3 py-2 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-semibold text-center active:scale-95">Reset</button>
                     </div>
                     <div class="pt-2 mt-1 border-t border-stone-800 space-y-2">
-                        <p class="text-[10px] leading-relaxed text-stone-400"><span class="font-bold text-amber-400">Fine-tune:</span> after the initial setting is applied, run calibration again and paste the new adjustment here. It is added (in dB, per channel) to the current setting above.</p>
+                        <p class="text-[10px] leading-relaxed text-stone-400"><span class="font-bold text-amber-400">Fine-tune:</span> add secondary adjustment in dB per channel.</p>
                         <textarea id="balance-update-setting" rows="1" spellcheck="false" placeholder="BALANCE_V1|L=-1.12|R=+1.12" class="w-full p-2 rounded bg-stone-900 border border-stone-700 text-xs font-mono text-amber-200 placeholder:text-stone-600 focus:outline-none focus:border-amber-500"></textarea>
-                        <button id="apply-balance-update" type="button" class="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold">Add Update to Current Setting</button>
+                        <button id="apply-balance-update" type="button" class="w-full sm:w-auto px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-stone-950 text-[11px] font-bold text-center active:scale-95">Add Update to Current Setting</button>
                     </div>
                     <p id="balance-setting-status" class="text-[10px] text-stone-400" aria-live="polite">No calibration setting loaded.</p>
-                </div>
-
-                <!-- Export / Download Rendered Audio -->
-                <div class="pt-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        <button id="btn-export-side-a" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-extrabold rounded-lg shadow-lg shadow-amber-600/20 transition flex items-center justify-center space-x-2 text-xs sm:text-sm active:scale-95">
-                            <i class="fa-solid fa-download text-base"></i>
-                            <span>Export Side A WAV</span>
-                        </button>
-                        <button id="btn-export-side-b" class="w-full py-3 bg-gradient-to-r from-stone-700 to-stone-600 hover:from-stone-600 hover:to-stone-500 text-white font-extrabold rounded-lg shadow-lg transition flex items-center justify-center space-x-2 text-xs sm:text-sm active:scale-95">
-                            <i class="fa-solid fa-download text-base"></i>
-                            <span>Export Side B WAV</span>
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-center text-stone-500 mt-2">
-                        Applies tape formulation bias curve, DSP pre-emphasis, safety limiter, and calibrated speed.
-                    </p>
                 </div>
             </div>
         </div>
@@ -308,7 +484,7 @@
         <!-- Right Panel: Tape Layout Optimizer & Track Allocation -->
         <div class="lg:col-span-7 space-y-5 sm:space-y-6">
 
-            <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="bg-stone-900 border border-stone-800 rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                     <h2 class="font-bold text-stone-200 text-xs sm:text-sm">Layout Auto-Fitting</h2>
                     <p class="text-[11px] sm:text-xs text-stone-400">Bin-packs tracks to fit cassette side lengths.</p>
@@ -323,65 +499,86 @@
                 </div>
             </div>
 
-            <!-- Tape Sides Layout (Side A & Side B) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Tape Sides Layout (Side A & Side B) with Export Buttons on Top -->
+            <div class="space-y-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
 
-                <!-- SIDE A BOX -->
-                <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-col justify-between" id="side-a-container">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center space-x-2">
-                                <span class="px-2 py-0.5 bg-amber-500 text-stone-950 font-extrabold text-[11px] rounded">SIDE A</span>
-                                <span class="text-xs font-mono text-stone-300" id="side-a-track-count">0 tracks</span>
+                    <!-- SIDE A COLUMN -->
+                    <div class="flex flex-col space-y-2">
+                        <button id="btn-export-side-a" class="w-full py-2.5 sm:py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-extrabold rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center space-x-2 text-xs sm:text-sm active:scale-95">
+                            <i class="fa-solid fa-download text-base"></i>
+                            <span>Export Side A WAV</span>
+                        </button>
+
+                        <!-- SIDE A BOX -->
+                        <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-col justify-between flex-1" id="side-a-container">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-0.5 bg-amber-500 text-stone-950 font-extrabold text-[11px] rounded">SIDE A</span>
+                                        <span class="text-xs font-mono text-stone-300" id="side-a-track-count">0 tracks</span>
+                                    </div>
+                                    <span class="text-xs font-mono font-bold text-amber-400" id="side-a-time-text">00:00 / 30:00</span>
+                                </div>
+
+                                <div class="w-full h-2.5 bg-stone-950 rounded-full overflow-hidden border border-stone-800 mb-3">
+                                    <div id="side-a-bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%;"></div>
+                                </div>
+
+                                <div id="side-a-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
+                                    <div class="text-center py-6 text-stone-600 text-xs empty-prompt">
+                                        Drop or assign tracks for Side A
+                                    </div>
+                                </div>
                             </div>
-                            <span class="text-xs font-mono font-bold text-amber-400" id="side-a-time-text">00:00 / 30:00</span>
-                        </div>
 
-                        <div class="w-full h-2.5 bg-stone-950 rounded-full overflow-hidden border border-stone-800 mb-3">
-                            <div id="side-a-bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%;"></div>
-                        </div>
-
-                        <div id="side-a-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
-                            <div class="text-center py-6 text-stone-600 text-xs empty-prompt">
-                                Drop or assign tracks for Side A
+                            <div class="mt-3 pt-2 border-t border-stone-800 flex justify-between text-[11px] font-mono">
+                                <span class="text-stone-400">Remaining Leader Pad:</span>
+                                <span id="side-a-remaining" class="text-amber-400">30:00</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-3 pt-2 border-t border-stone-800 flex justify-between text-[11px] font-mono">
-                        <span class="text-stone-400">Remaining Leader Pad:</span>
-                        <span id="side-a-remaining" class="text-amber-400">30:00</span>
+                    <!-- SIDE B COLUMN -->
+                    <div class="flex flex-col space-y-2">
+                        <button id="btn-export-side-b" class="w-full py-2.5 sm:py-3 bg-gradient-to-r from-stone-700 to-stone-600 hover:from-stone-600 hover:to-stone-500 text-white font-extrabold rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-xs sm:text-sm active:scale-95">
+                            <i class="fa-solid fa-download text-base"></i>
+                            <span>Export Side B WAV</span>
+                        </button>
+
+                        <!-- SIDE B BOX -->
+                        <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-col justify-between flex-1" id="side-b-container">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-300 font-extrabold text-[11px] rounded">SIDE B</span>
+                                        <span class="text-xs font-mono text-stone-300" id="side-b-track-count">0 tracks</span>
+                                    </div>
+                                    <span class="text-xs font-mono font-bold text-amber-400" id="side-b-time-text">00:00 / 30:00</span>
+                                </div>
+
+                                <div class="w-full h-2.5 bg-stone-950 rounded-full overflow-hidden border border-stone-800 mb-3">
+                                    <div id="side-b-bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%;"></div>
+                                </div>
+
+                                <div id="side-b-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
+                                    <div class="text-center py-6 text-stone-600 text-xs empty-prompt">
+                                        Drop or assign tracks for Side B
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-2 border-t border-stone-800 flex justify-between text-[11px] font-mono">
+                                <span class="text-stone-400">Remaining Leader Pad:</span>
+                                <span id="side-b-remaining" class="text-amber-400">30:00</span>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
-
-                <!-- SIDE B BOX -->
-                <div class="bg-stone-900 border border-stone-800 rounded-xl p-4 flex flex-col justify-between" id="side-b-container">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center space-x-2">
-                                <span class="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-300 font-extrabold text-[11px] rounded">SIDE B</span>
-                                <span class="text-xs font-mono text-stone-300" id="side-b-track-count">0 tracks</span>
-                            </div>
-                            <span class="text-xs font-mono font-bold text-amber-400" id="side-b-time-text">00:00 / 30:00</span>
-                        </div>
-
-                        <div class="w-full h-2.5 bg-stone-950 rounded-full overflow-hidden border border-stone-800 mb-3">
-                            <div id="side-b-bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%;"></div>
-                        </div>
-
-                        <div id="side-b-list" class="min-h-[160px] max-h-[260px] overflow-y-auto space-y-2 p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg">
-                            <div class="text-center py-6 text-stone-600 text-xs empty-prompt">
-                                Drop or assign tracks for Side B
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-3 pt-2 border-t border-stone-800 flex justify-between text-[11px] font-mono">
-                        <span class="text-stone-400">Remaining Leader Pad:</span>
-                        <span id="side-b-remaining" class="text-amber-400">30:00</span>
-                    </div>
-                </div>
-
+                <p class="text-[10px] text-center text-stone-500 pt-1">
+                    Applies tape formulation bias curve, DSP pre-emphasis, safety limiter, and calibrated speed.
+                </p>
             </div>
 
             <!-- Unassigned Pool -->
@@ -423,8 +620,365 @@
             tracks: [],
             activeSide: 'A',
             playingIndex: -1,
-            isPlaying: false
+            isPlaying: false,
+            noiseCancellation: {
+                enabled: true,
+                profile: null,
+                reductionDb: 12.0,
+                spectralFloorDb: -16.0,
+                mode: 'balanced', // 'transparent' | 'balanced' | 'aggressive'
+                bandFocus: 'all', // 'all' | 'hum_only' | 'hiss_only'
+                humNotchEnabled: true
+            }
         };
+
+        // Fast Radix-2 Cooley-Tukey FFT implementation for in-browser noise reduction
+        class FastFFT {
+            constructor(size) {
+                this.size = size;
+                this.cosTable = new Float32Array(size / 2);
+                this.sinTable = new Float32Array(size / 2);
+                this.bitReverse = new Uint32Array(size);
+
+                for (let i = 0; i < size / 2; i++) {
+                    const angle = (-2 * Math.PI * i) / size;
+                    this.cosTable[i] = Math.cos(angle);
+                    this.sinTable[i] = Math.sin(angle);
+                }
+
+                const bits = Math.round(Math.log2(size));
+                for (let i = 0; i < size; i++) {
+                    let rev = 0;
+                    for (let j = 0; j < bits; j++) {
+                        rev = (rev << 1) | ((i >> j) & 1);
+                    }
+                    this.bitReverse[i] = rev;
+                }
+            }
+
+            transform(real, imag) {
+                const n = this.size;
+                for (let i = 0; i < n; i++) {
+                    const j = this.bitReverse[i];
+                    if (j > i) {
+                        const tempR = real[i]; real[i] = real[j]; real[j] = tempR;
+                        const tempI = imag[i]; imag[i] = imag[j]; imag[j] = tempI;
+                    }
+                }
+                for (let len = 2; len <= n; len <<= 1) {
+                    const halfLen = len >> 1;
+                    const step = n / len;
+                    for (let i = 0; i < n; i += len) {
+                        for (let j = 0; j < halfLen; j++) {
+                            const tableIdx = j * step;
+                            const uR = real[i + j];
+                            const uI = imag[i + j];
+                            const vR = real[i + j + halfLen] * this.cosTable[tableIdx] - imag[i + j + halfLen] * this.sinTable[tableIdx];
+                            const vI = real[i + j + halfLen] * this.sinTable[tableIdx] + imag[i + j + halfLen] * this.cosTable[tableIdx];
+                            real[i + j] = uR + vR;
+                            imag[i + j] = uI + vI;
+                            real[i + j + halfLen] = uR - vR;
+                            imag[i + j + halfLen] = uI - vI;
+                        }
+                    }
+                }
+            }
+
+            inverseTransform(real, imag) {
+                const n = this.size;
+                for (let i = 0; i < n; i++) imag[i] = -imag[i];
+                this.transform(real, imag);
+                const invN = 1 / n;
+                for (let i = 0; i < n; i++) {
+                    real[i] = real[i] * invN;
+                    imag[i] = -imag[i] * invN;
+                }
+            }
+        }
+
+        function createHannWindow(size) {
+            const win = new Float32Array(size);
+            for (let i = 0; i < size; i++) {
+                win[i] = 0.5 * (1 - Math.cos((2 * Math.PI * i) / (size - 1)));
+            }
+            return win;
+        }
+
+        function analyzeNoiseSample(audioBuffer, name = "Cassette Noise Sample") {
+            const sampleRate = audioBuffer.sampleRate;
+            const fftSize = 2048;
+            const hopSize = fftSize / 4;
+            const fft = new FastFFT(fftSize);
+            const window = createHannWindow(fftSize);
+
+            const numChannels = Math.min(2, audioBuffer.numberOfChannels);
+            const chData = [
+                audioBuffer.getChannelData(0),
+                audioBuffer.getChannelData(numChannels > 1 ? 1 : 0)
+            ];
+
+            const bins = fftSize / 2 + 1;
+            const leftSum = new Float64Array(bins);
+            const rightSum = new Float64Array(bins);
+
+            let frameCount = 0;
+            const totalSamples = audioBuffer.length;
+            const real = new Float32Array(fftSize);
+            const imag = new Float32Array(fftSize);
+
+            for (let offset = 0; offset + fftSize <= totalSamples; offset += hopSize) {
+                for (let ch = 0; ch < 2; ch++) {
+                    const src = chData[ch];
+                    for (let i = 0; i < fftSize; i++) {
+                        real[i] = src[offset + i] * window[i];
+                        imag[i] = 0;
+                    }
+                    fft.transform(real, imag);
+                    const sumTarget = ch === 0 ? leftSum : rightSum;
+                    for (let k = 0; k < bins; k++) {
+                        sumTarget[k] += Math.sqrt(real[k] * real[k] + imag[k] * imag[k]);
+                    }
+                }
+                frameCount++;
+            }
+            if (frameCount === 0) frameCount = 1;
+
+            const leftProfile = new Float32Array(bins);
+            const rightProfile = new Float32Array(bins);
+            for (let k = 0; k < bins; k++) {
+                leftProfile[k] = leftSum[k] / frameCount;
+                rightProfile[k] = rightSum[k] / frameCount;
+            }
+
+            // Detect hum peak around 45Hz - 65Hz
+            const binWidth = sampleRate / fftSize;
+            let maxHumBin = -1;
+            let maxHumMag = 0;
+            const minBin = Math.max(1, Math.floor(45 / binWidth));
+            const maxBin = Math.min(bins - 1, Math.ceil(65 / binWidth));
+
+            for (let k = minBin; k <= maxBin; k++) {
+                const avgMag = 0.5 * (leftProfile[k] + rightProfile[k]);
+                if (avgMag > maxHumMag) {
+                    maxHumMag = avgMag;
+                    maxHumBin = k;
+                }
+            }
+
+            let detectedHumHz = 60.0;
+            if (maxHumBin !== -1) {
+                const y0 = leftProfile[maxHumBin - 1] || 0;
+                const y1 = leftProfile[maxHumBin];
+                const y2 = leftProfile[maxHumBin + 1] || 0;
+                const denom = y0 - 2 * y1 + y2;
+                const delta = denom !== 0 ? (y0 - y2) / (2 * denom) : 0;
+                const peakFreq = (maxHumBin + delta) * binWidth;
+                detectedHumHz = Math.abs(peakFreq - 50) < Math.abs(peakFreq - 60) ? 50.0 : 60.0;
+                if (Math.abs(peakFreq - 50) < 6 || Math.abs(peakFreq - 60) < 6) {
+                    detectedHumHz = Math.round(peakFreq * 10) / 10;
+                }
+            }
+
+            let sumSq = 0;
+            const ch0 = chData[0];
+            const step = Math.max(1, Math.floor(totalSamples / 10000));
+            let count = 0;
+            for (let i = 0; i < totalSamples; i += step) {
+                sumSq += ch0[i] * ch0[i];
+                count++;
+            }
+            const rms = Math.sqrt(sumSq / Math.max(1, count));
+            const rmsDb = rms > 1e-6 ? 20 * Math.log10(rms) : -90;
+            const humStrengthDb = maxHumMag > 1e-6 ? 20 * Math.log10(maxHumMag / (rms + 1e-6)) : 12;
+
+            return {
+                name,
+                duration: audioBuffer.duration,
+                sampleRate,
+                fftSize,
+                leftProfile,
+                rightProfile,
+                detectedHumHz,
+                humStrengthDb: Math.max(0, Math.round(humStrengthDb * 10) / 10),
+                rmsDb: Math.round(rmsDb * 10) / 10
+            };
+        }
+
+        function createSyntheticNoiseProfile(type, sampleRate = 44100) {
+            const fftSize = 2048;
+            const bins = fftSize / 2 + 1;
+            const binWidth = sampleRate / fftSize;
+            const leftProfile = new Float32Array(bins);
+            const rightProfile = new Float32Array(bins);
+
+            const humFreq = type === '50hz_eu' ? 50.0 : 60.0;
+            const baseHiss = type === 'type1_ferric' ? 0.005 : 0.003;
+
+            for (let k = 0; k < bins; k++) {
+                const freq = k * binWidth;
+                let hiss = baseHiss * (1 + 0.3 * Math.log10(Math.max(1, freq / 1000)));
+                let humAdd = 0;
+                for (let h = 1; h <= 6; h++) {
+                    const harmFreq = humFreq * h;
+                    const dist = Math.abs(freq - harmFreq);
+                    if (dist < binWidth * 1.5) {
+                        const falloff = Math.exp(-dist / (binWidth * 0.8));
+                        humAdd += (0.02 / h) * falloff;
+                    }
+                }
+                const val = Math.max(0.0001, hiss + humAdd);
+                leftProfile[k] = val;
+                rightProfile[k] = val;
+            }
+
+            const names = {
+                '60hz_us': '60Hz US Ground Hum & Hiss (Calibrated)',
+                '50hz_eu': '50Hz EU Transformer Hum (Calibrated)',
+                'type1_ferric': 'Type I Ferric High-Hiss Profile (Calibrated)'
+            };
+
+            return {
+                name: names[type] || 'Cassette Hum Profile',
+                duration: 5.0,
+                sampleRate,
+                fftSize,
+                leftProfile,
+                rightProfile,
+                detectedHumHz: humFreq,
+                humStrengthDb: 18.5,
+                rmsDb: -46.5
+            };
+        }
+
+        function applySpectralDenoise(audioCtx, inputBuffer, profile, options) {
+            if (!options.enabled || !profile) return inputBuffer;
+
+            const sampleRate = inputBuffer.sampleRate;
+            const numChannels = inputBuffer.numberOfChannels;
+            const length = inputBuffer.length;
+            const fftSize = profile.fftSize || 2048;
+            const hopSize = fftSize / 4;
+            const bins = fftSize / 2 + 1;
+            const binWidth = sampleRate / fftSize;
+
+            const fft = new FastFFT(fftSize);
+            const window = createHannWindow(fftSize);
+            const normFactor = 1.5; // for 4x overlap Hann
+
+            const reductionLinear = Math.pow(10, -Math.abs(options.reductionDb) / 20);
+            const spectralFloorLinear = Math.pow(10, options.spectralFloorDb / 20);
+
+            let oversubtraction = options.mode === 'transparent' ? 1.1 : options.mode === 'aggressive' ? 1.6 : 1.25;
+            let temporalSmoothing = options.mode === 'transparent' ? 0.5 : options.mode === 'aggressive' ? 0.2 : 0.35;
+
+            const outBuffer = audioCtx.createBuffer(numChannels, length, sampleRate);
+            const real = new Float32Array(fftSize);
+            const imag = new Float32Array(fftSize);
+            const gainCurve = new Float32Array(bins);
+            const smoothedGain = new Float32Array(bins);
+            const channelPrevGain = new Float32Array(bins);
+
+            // Harmonic notch frequencies
+            const humHarmonics = [];
+            if (options.humNotchEnabled && profile.detectedHumHz > 30) {
+                for (let h = 1; h <= 8; h++) {
+                    const f = profile.detectedHumHz * h;
+                    if (f < sampleRate / 2) humHarmonics.push(f);
+                }
+            }
+
+            // Band focus weights
+            const bandWeight = new Float32Array(bins);
+            for (let k = 0; k < bins; k++) {
+                const f = k * binWidth;
+                if (options.bandFocus === 'hum_only') {
+                    bandWeight[k] = f < 800 ? 1.0 : Math.max(0, 1.0 - (f - 800) / 400);
+                } else if (options.bandFocus === 'hiss_only') {
+                    bandWeight[k] = f > 2000 ? 1.0 : Math.max(0, (f - 1200) / 800);
+                } else {
+                    bandWeight[k] = f < 10000 ? 1.0 : Math.max(0.7, 1.0 - (f - 10000) / 10000);
+                }
+            }
+
+            for (let ch = 0; ch < numChannels; ch++) {
+                const inData = inputBuffer.getChannelData(ch);
+                const outData = outBuffer.getChannelData(ch);
+                const noiseProf = ch === 0 ? profile.leftProfile : profile.rightProfile;
+                channelPrevGain.fill(1.0);
+
+                for (let offset = 0; offset < length; offset += hopSize) {
+                    for (let i = 0; i < fftSize; i++) {
+                        const inIdx = offset + i;
+                        real[i] = (inIdx < length ? inData[inIdx] : 0) * window[i];
+                        imag[i] = 0;
+                    }
+
+                    fft.transform(real, imag);
+
+                    for (let k = 0; k < bins; k++) {
+                        const r = real[k];
+                        const im = imag[k];
+                        const mag = Math.sqrt(r * r + im * im) + 1e-9;
+                        const noiseEst = (k < noiseProf.length ? noiseProf[k] : 0.001) * bandWeight[k];
+                        const snr = mag / (noiseEst + 1e-9);
+
+                        let rawGain = 1.0;
+                        if (snr < 1.0 + oversubtraction) {
+                            const sub = 1.0 - (oversubtraction * noiseEst) / mag;
+                            rawGain = Math.max(spectralFloorLinear, Math.max(0, sub));
+                        } else {
+                            const sub = 1.0 - (noiseEst / mag) * (1.0 - reductionLinear);
+                            rawGain = Math.max(reductionLinear, sub);
+                        }
+
+                        if (options.humNotchEnabled) {
+                            const freq = k * binWidth;
+                            for (let h = 0; h < humHarmonics.length; h++) {
+                                const dist = Math.abs(freq - humHarmonics[h]);
+                                if (dist < binWidth * 0.9) {
+                                    rawGain = Math.min(rawGain, Math.max(0.05, dist / (binWidth * 0.9)));
+                                    break;
+                                }
+                            }
+                        }
+                        gainCurve[k] = rawGain;
+                    }
+
+                    // 3-bin smoothing to prevent musical chirps
+                    smoothedGain[0] = gainCurve[0];
+                    smoothedGain[bins - 1] = gainCurve[bins - 1];
+                    for (let k = 1; k < bins - 1; k++) {
+                        smoothedGain[k] = 0.25 * gainCurve[k - 1] + 0.5 * gainCurve[k] + 0.25 * gainCurve[k + 1];
+                    }
+
+                    // Temporal smoothing
+                    for (let k = 0; k < bins; k++) {
+                        const target = smoothedGain[k];
+                        const alpha = target > channelPrevGain[k] ? 0.7 : temporalSmoothing;
+                        const g = alpha * channelPrevGain[k] + (1 - alpha) * target;
+                        channelPrevGain[k] = g;
+                        real[k] *= g;
+                        imag[k] *= g;
+                    }
+
+                    for (let k = bins; k < fftSize; k++) {
+                        real[k] = real[fftSize - k];
+                        imag[k] = -imag[fftSize - k];
+                    }
+
+                    fft.inverseTransform(real, imag);
+
+                    for (let i = 0; i < fftSize; i++) {
+                        const outIdx = offset + i;
+                        if (outIdx < length) {
+                            outData[outIdx] += (real[i] * window[i]) / normFactor;
+                        }
+                    }
+                }
+            }
+
+            return outBuffer;
+        }
 
         let audioCtx = null;
         let currentSourceNode = null;
@@ -544,7 +1098,7 @@
 
             trackList.forEach((track, idx) => {
                 const item = document.createElement('div');
-                item.className = `p-2.5 bg-stone-900 border rounded-lg flex items-center justify-between text-xs transition ${
+                item.className = `p-2 sm:p-2.5 bg-stone-900 border rounded-lg flex items-center justify-between text-xs transition gap-2 ${
                     state.isPlaying && state.activeSide === sideKey && state.playingIndex === idx
                         ? 'border-amber-500 bg-amber-500/10'
                         : 'border-stone-800'
@@ -557,25 +1111,25 @@
                 });
 
                 item.innerHTML = `
-                    <div class="flex items-center space-x-2 truncate mr-2">
-                        <button class="play-single-btn text-stone-400 hover:text-amber-400 p-1 transition" title="Preview track">
+                    <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0 flex-1">
+                        <button class="play-single-btn text-stone-400 hover:text-amber-400 p-1 transition flex-shrink-0 active:scale-95" title="Preview track" aria-label="Play track">
                             <i class="fa-solid ${state.isPlaying && state.activeSide === sideKey && state.playingIndex === idx ? 'fa-pause text-amber-500' : 'fa-play'}"></i>
                         </button>
-                        <span class="font-medium text-stone-200 truncate">${track.name}</span>
+                        <span class="font-medium text-stone-200 truncate text-[11px] sm:text-xs block">${track.name}</span>
                     </div>
-                    <div class="flex items-center space-x-1.5 flex-shrink-0">
-                        <span class="font-mono text-stone-400 text-[10px] sm:text-[11px] bg-stone-950 px-1.5 py-0.5 rounded border border-stone-800">
+                    <div class="flex items-center space-x-1 sm:space-x-1.5 flex-shrink-0">
+                        <span class="font-mono text-stone-400 text-[10px] sm:text-[11px] bg-stone-950 px-1 sm:px-1.5 py-0.5 rounded border border-stone-800">
                             ${formatTime(track.duration)}
                         </span>
                         ${sideKey !== 'pool' ? `
-                            <button class="move-pool-btn text-stone-500 hover:text-stone-300 p-1.5" title="Move to pool">
+                            <button class="move-pool-btn text-stone-500 hover:text-stone-300 p-1 sm:p-1.5 active:scale-95" title="Move to pool" aria-label="Return to unassigned pool">
                                 <i class="fa-solid fa-arrow-rotate-left"></i>
                             </button>
                         ` : `
-                            <button class="move-side-a text-amber-500 hover:text-amber-400 px-1 py-0.5 font-bold text-[10px] bg-amber-500/10 rounded" title="Move to Side A">A</button>
-                            <button class="move-side-b text-stone-300 hover:text-white px-1 py-0.5 font-bold text-[10px] bg-stone-800 rounded" title="Move to Side B">B</button>
+                            <button class="move-side-a text-amber-500 hover:text-amber-400 px-1.5 py-0.5 font-bold text-[10px] bg-amber-500/10 rounded active:scale-95" title="Move to Side A">A</button>
+                            <button class="move-side-b text-stone-300 hover:text-white px-1.5 py-0.5 font-bold text-[10px] bg-stone-800 rounded active:scale-95" title="Move to Side B">B</button>
                         `}
-                        <button class="delete-track-btn text-red-400/80 hover:text-red-300 p-1.5 rounded transition" title="Remove track">
+                        <button class="delete-track-btn text-red-400/80 hover:text-red-300 p-1 sm:p-1.5 rounded transition active:scale-95" title="Remove track" aria-label="Delete track">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -986,6 +1540,11 @@
 
         function startTimerAnimation() {
             const canvas = document.getElementById('deck-visualizer');
+            if (!canvas) return;
+            if (canvas.parentElement && canvas.parentElement.clientWidth > 0) {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight || 96;
+            }
             const ctx = canvas.getContext('2d');
             const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
 
@@ -1002,7 +1561,7 @@
                 let x = 0;
                 for (let i = 0; i < dataArray.length; i++) {
                     const barHeight = (dataArray[i] / 255) * canvas.height;
-                    ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
+                    ctx.fillRect(x, canvas.height - barHeight, Math.max(1, barWidth - 1), barHeight);
                     x += barWidth;
                 }
                 animFrameId = requestAnimationFrame(draw);
@@ -1234,15 +1793,29 @@
             const rate = Math.max(0.1, 1 + (state.speedPercent / 100));
             const nativeSampleRate = activeTracks[0].buffer.sampleRate || 44100;
             const safetyTailSeconds = 1.0;
+
+            // Apply Cassette Hum & Noise Profile Cancellation if active
+            const processedTracks = [];
+            for (let i = 0; i < activeTracks.length; i++) {
+                const track = activeTracks[i];
+                if (state.noiseCancellation && state.noiseCancellation.enabled && state.noiseCancellation.profile) {
+                    showToast(`Noise Cancellation: cleaning ${track.name} [${i + 1}/${activeTracks.length}]...`);
+                    const cleanedBuffer = applySpectralDenoise(audioCtx, track.buffer, state.noiseCancellation.profile, state.noiseCancellation);
+                    processedTracks.push({ ...track, buffer: cleanedBuffer });
+                } else {
+                    processedTracks.push(track);
+                }
+            }
+
             let currentTimeOffset = 0;
             const trackStartTimes = [];
 
-            activeTracks.forEach((track, i) => {
+            processedTracks.forEach((track, i) => {
                 const resampleRatio = track.buffer.sampleRate / nativeSampleRate;
                 const sourceDuration = (track.buffer.duration * resampleRatio) / rate;
                 trackStartTimes.push({ track, startTime: currentTimeOffset, sourceDuration });
                 currentTimeOffset += sourceDuration;
-                if (i < activeTracks.length - 1) currentTimeOffset += Math.max(0, state.gapSeconds);
+                if (i < processedTracks.length - 1) currentTimeOffset += Math.max(0, state.gapSeconds);
             });
 
             const totalRenderDuration = currentTimeOffset + safetyTailSeconds;
@@ -1292,8 +1865,9 @@
                 const a = document.createElement('a');
 
                 const speedSign = state.speedPercent >= 0 ? '+' : '';
+                const noiseTag = (state.noiseCancellation && state.noiseCancellation.enabled && state.noiseCancellation.profile) ? '_DENOISED' : '';
                 a.href = url;
-                a.download = `${fullPrefix}_Side_${side}_${speedSign}${state.speedPercent.toFixed(2)}pct.wav`;
+                a.download = `${fullPrefix}${noiseTag}_Side_${side}_${speedSign}${state.speedPercent.toFixed(2)}pct.wav`;
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
@@ -1353,6 +1927,310 @@
             }
             return new Blob([out], { type: "audio/wav" });
         }
+
+        // Noise Cancellation UI Event Handling & Spectrum Canvas
+        const noiseSampleInput = document.getElementById('noise-sample-input');
+        const noiseCard = document.getElementById('noise-cancellation-card');
+        const denoiseEnabledCheck = document.getElementById('denoise-enabled');
+        const denoiseToggleLabel = document.getElementById('denoise-toggle-label');
+        const profileNameDisplay = document.getElementById('profile-name-display');
+        const profileSubDisplay = document.getElementById('profile-sub-display');
+        const profileHumDisplay = document.getElementById('profile-hum-display');
+        const profileRmsDisplay = document.getElementById('profile-rms-display');
+        const profileSpikeDisplay = document.getElementById('profile-spike-display');
+        const noiseSpectrumCanvas = document.getElementById('noise-spectrum-canvas');
+        const btnClearNoise = document.getElementById('btn-clear-noise');
+        const denoiseReductionSlider = document.getElementById('denoise-reduction-slider');
+        const denoiseReductionVal = document.getElementById('denoise-reduction-val');
+        const denoiseFloorSlider = document.getElementById('denoise-floor-slider');
+        const denoiseFloorVal = document.getElementById('denoise-floor-val');
+        const denoiseHumComb = document.getElementById('denoise-hum-comb');
+        const btnSampleLinein = document.getElementById('btn-sample-linein');
+        const sampleRecordBar = document.getElementById('sample-record-bar');
+        const sampleRecordLabel = document.getElementById('sample-record-label');
+
+        function drawNoiseSpectrum() {
+            if (!noiseSpectrumCanvas) return;
+            const parent = noiseSpectrumCanvas.parentElement;
+            if (parent && parent.clientWidth > 0) {
+                noiseSpectrumCanvas.width = parent.clientWidth;
+                noiseSpectrumCanvas.height = parent.clientHeight || 96;
+            }
+            const ctx = noiseSpectrumCanvas.getContext('2d');
+            const w = noiseSpectrumCanvas.width;
+            const h = noiseSpectrumCanvas.height;
+            if (w === 0 || h === 0) return;
+            ctx.clearRect(0, 0, w, h);
+
+            const logMin = Math.log10(20);
+            const logMax = Math.log10(20000);
+            const markers = [50, 60, 100, 200, 500, 1000, 2000, 5000, 10000];
+
+            ctx.strokeStyle = '#292524';
+            ctx.lineWidth = 1;
+            markers.forEach(f => {
+                const x = ((Math.log10(f) - logMin) / (logMax - logMin)) * w;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+                ctx.fillStyle = '#78716c';
+                ctx.font = '8px monospace';
+                ctx.fillText(f >= 1000 ? `${f / 1000}k` : `${f}`, x + 2, h - 3);
+            });
+
+            const prof = state.noiseCancellation.profile;
+            if (!prof) return;
+
+            const bins = prof.leftProfile.length;
+            const binWidth = (prof.sampleRate / 2) / bins;
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 1.5;
+
+            let started = false;
+            for (let k = 1; k < bins; k++) {
+                const freq = k * binWidth;
+                if (freq < 20 || freq > 20000) continue;
+                const x = ((Math.log10(freq) - logMin) / (logMax - logMin)) * w;
+                const mag = 0.5 * (prof.leftProfile[k] + prof.rightProfile[k]);
+                const db = 20 * Math.log10(mag + 1e-6);
+                const y = h - Math.max(0, Math.min(h, ((db + 80) / 70) * h));
+
+                if (!started) { ctx.moveTo(x, y); started = true; }
+                else { ctx.lineTo(x, y); }
+            }
+            ctx.stroke();
+
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
+            ctx.fillStyle = 'rgba(217, 119, 6, 0.12)';
+            ctx.fill();
+
+            if (prof.detectedHumHz > 30) {
+                const humX = ((Math.log10(prof.detectedHumHz) - logMin) / (logMax - logMin)) * w;
+                ctx.strokeStyle = '#ef4444';
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(humX, 0);
+                ctx.lineTo(humX, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 9px monospace';
+                ctx.fillText(`Hum ${prof.detectedHumHz.toFixed(1)}Hz`, Math.max(2, Math.min(w - 70, humX - 25)), 10);
+            }
+        }
+
+        function setLoadedNoiseProfile(prof) {
+            state.noiseCancellation.profile = prof;
+            profileNameDisplay.textContent = prof.name;
+            profileSubDisplay.textContent = `${prof.duration.toFixed(1)}s sample · ${prof.sampleRate} Hz · ${prof.fftSize}-pt FFT`;
+            profileHumDisplay.textContent = `${prof.detectedHumHz.toFixed(1)} Hz`;
+            profileRmsDisplay.textContent = `${prof.rmsDb.toFixed(1)} dBFS`;
+            profileSpikeDisplay.textContent = `+${prof.humStrengthDb.toFixed(1)} dB`;
+            drawNoiseSpectrum();
+            showToast(`Loaded cassette noise sample: "${prof.name}".`);
+        }
+
+        async function processNoiseFile(file) {
+            initAudioContext();
+            try {
+                showToast(`Analyzing noise sample: ${file.name}...`);
+                const arrayBuffer = await file.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                const prof = analyzeNoiseSample(audioBuffer, file.name);
+                setLoadedNoiseProfile(prof);
+            } catch (err) {
+                console.error("Noise decoding error:", err);
+                showToast("Failed to decode noise recording file.");
+            }
+        }
+
+        if (noiseSampleInput) {
+            noiseSampleInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    processNoiseFile(e.target.files[0]);
+                }
+            });
+        }
+
+        // Drag & drop directly onto noise card
+        if (noiseCard) {
+            ['dragenter', 'dragover'].forEach(name => {
+                noiseCard.addEventListener(name, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    noiseCard.classList.add('border-amber-500');
+                });
+            });
+            ['dragleave', 'drop'].forEach(name => {
+                noiseCard.addEventListener(name, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    noiseCard.classList.remove('border-amber-500');
+                });
+            });
+            noiseCard.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (files && files.length > 0) {
+                    processNoiseFile(files[0]);
+                }
+            });
+        }
+
+        // Calibrated Presets
+        document.querySelectorAll('.noise-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                initAudioContext();
+                const type = btn.dataset.preset;
+                const prof = createSyntheticNoiseProfile(type, audioCtx ? audioCtx.sampleRate : 44100);
+                setLoadedNoiseProfile(prof);
+            });
+        });
+
+        // Live Line-In Sampling
+        if (btnSampleLinein) {
+            let isLineInRecording = false;
+            btnSampleLinein.addEventListener('click', async () => {
+                if (isLineInRecording) return;
+                try {
+                    initAudioContext();
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const chunks = [];
+                    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+                    mediaRecorder.onstop = async () => {
+                        stream.getTracks().forEach(t => t.stop());
+                        const blob = new Blob(chunks, { type: 'audio/wav' });
+                        const arrayBuffer = await blob.arrayBuffer();
+                        const buf = await audioCtx.decodeAudioData(arrayBuffer);
+                        const prof = analyzeNoiseSample(buf, "Direct Line-In Cassette Sample");
+                        setLoadedNoiseProfile(prof);
+                        isLineInRecording = false;
+                        sampleRecordBar.style.width = '0%';
+                        sampleRecordLabel.textContent = "Sample From Line-In / Mic";
+                    };
+
+                    mediaRecorder.start();
+                    isLineInRecording = true;
+                    sampleRecordLabel.textContent = "Sampling line-in...";
+
+                    const durationMs = 4000;
+                    const startTime = Date.now();
+                    const interval = setInterval(() => {
+                        const elapsed = Date.now() - startTime;
+                        const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
+                        sampleRecordBar.style.width = `${pct}%`;
+                        if (elapsed >= durationMs) {
+                            clearInterval(interval);
+                            if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+                        }
+                    }, 100);
+                } catch (err) {
+                    console.error("Line-in mic error:", err);
+                    showToast("Microphone or Line-In permission denied.");
+                }
+            });
+        }
+
+        // Toggles & Sliders
+        if (denoiseEnabledCheck) {
+            denoiseEnabledCheck.addEventListener('change', (e) => {
+                state.noiseCancellation.enabled = e.target.checked;
+                denoiseToggleLabel.textContent = e.target.checked ? "Active" : "Bypassed";
+                showToast(`Noise Cancellation ${e.target.checked ? "activated" : "bypassed"}.`);
+            });
+        }
+
+        document.querySelectorAll('.denoise-mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.denoise-mode-btn').forEach(b => {
+                    b.classList.remove('border-amber-500', 'bg-amber-500/20', 'text-amber-300', 'font-bold');
+                    b.classList.add('border-stone-800', 'bg-stone-950', 'text-stone-400');
+                });
+                btn.classList.remove('border-stone-800', 'bg-stone-950', 'text-stone-400');
+                btn.classList.add('border-amber-500', 'bg-amber-500/20', 'text-amber-300', 'font-bold');
+
+                const mode = btn.dataset.mode;
+                state.noiseCancellation.mode = mode;
+                if (mode === 'transparent') {
+                    state.noiseCancellation.reductionDb = 8;
+                    state.noiseCancellation.spectralFloorDb = -14;
+                } else if (mode === 'balanced') {
+                    state.noiseCancellation.reductionDb = 12;
+                    state.noiseCancellation.spectralFloorDb = -16;
+                } else {
+                    state.noiseCancellation.reductionDb = 18;
+                    state.noiseCancellation.spectralFloorDb = -20;
+                }
+                denoiseReductionSlider.value = state.noiseCancellation.reductionDb;
+                denoiseReductionVal.textContent = `-${state.noiseCancellation.reductionDb.toFixed(1)} dB`;
+                denoiseFloorSlider.value = state.noiseCancellation.spectralFloorDb;
+                denoiseFloorVal.textContent = `${state.noiseCancellation.spectralFloorDb} dB`;
+            });
+        });
+
+        if (denoiseReductionSlider) {
+            denoiseReductionSlider.addEventListener('input', (e) => {
+                state.noiseCancellation.reductionDb = parseFloat(e.target.value);
+                denoiseReductionVal.textContent = `-${state.noiseCancellation.reductionDb.toFixed(1)} dB`;
+            });
+        }
+
+        if (denoiseFloorSlider) {
+            denoiseFloorSlider.addEventListener('input', (e) => {
+                state.noiseCancellation.spectralFloorDb = parseFloat(e.target.value);
+                denoiseFloorVal.textContent = `${state.noiseCancellation.spectralFloorDb} dB`;
+            });
+        }
+
+        document.querySelectorAll('.denoise-band-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.denoise-band-btn').forEach(b => {
+                    b.classList.remove('border-amber-500', 'bg-amber-500/20', 'text-amber-300', 'font-bold');
+                    b.classList.add('border-stone-800', 'bg-stone-950', 'text-stone-400');
+                });
+                btn.classList.remove('border-stone-800', 'bg-stone-950', 'text-stone-400');
+                btn.classList.add('border-amber-500', 'bg-amber-500/20', 'text-amber-300', 'font-bold');
+                state.noiseCancellation.bandFocus = btn.dataset.band;
+            });
+        });
+
+        if (denoiseHumComb) {
+            denoiseHumComb.addEventListener('change', (e) => {
+                state.noiseCancellation.humNotchEnabled = e.target.checked;
+            });
+        }
+
+        if (btnClearNoise) {
+            btnClearNoise.addEventListener('click', () => {
+                state.noiseCancellation.profile = null;
+                profileNameDisplay.textContent = "No Cassette Noise Profile Loaded";
+                profileSubDisplay.textContent = "Drop or browse your blank tape hum sample";
+                profileHumDisplay.textContent = "-- Hz";
+                profileRmsDisplay.textContent = "-- dBFS";
+                profileSpikeDisplay.textContent = "+0 dB";
+                const ctx = noiseSpectrumCanvas.getContext('2d');
+                ctx.clearRect(0, 0, noiseSpectrumCanvas.width, noiseSpectrumCanvas.height);
+                showToast("Noise profile cleared.");
+            });
+        }
+
+        // Handle window resize dynamically for visualizers and canvas elements
+        window.addEventListener('resize', () => {
+            const deckCanvas = document.getElementById('deck-visualizer');
+            if (deckCanvas && deckCanvas.parentElement && deckCanvas.parentElement.clientWidth > 0) {
+                deckCanvas.width = deckCanvas.parentElement.clientWidth;
+                deckCanvas.height = deckCanvas.parentElement.clientHeight || 96;
+            }
+            drawNoiseSpectrum();
+        });
+
+        // Initialize with default calibrated 60Hz profile
+        const defaultProfile = createSyntheticNoiseProfile('60hz_us');
+        setLoadedNoiseProfile(defaultProfile);
 
         updateUI();
     </script>
