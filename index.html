@@ -63,6 +63,20 @@
         .spinning {
             animation: spin-slow 3s linear infinite;
         }
+        .drag-handle {
+            touch-action: none;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .drag-handle:active { cursor: grabbing; }
+        body.reordering, body.reordering * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
+        .track-dragging {
+            opacity: 0.85;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+            border-color: #f59e0b !important;
+            background-color: rgba(245,158,11,0.12) !important;
+        }
         button:disabled {
             opacity: 0.55;
             cursor: wait;
@@ -725,6 +739,34 @@
             }
         };
 
+        // Remember the last Active / Bypass setup between visits.
+        const FEATURES_STORAGE_KEY = 'tapedeckStudio.featureToggles.v1';
+
+        function saveFeatureToggles() {
+            try { localStorage.setItem(FEATURES_STORAGE_KEY, JSON.stringify(state.features)); } catch (_) {}
+        }
+
+        function restoreFeatureToggles() {
+            let saved = null;
+            try { saved = JSON.parse(localStorage.getItem(FEATURES_STORAGE_KEY) || 'null'); } catch (_) {}
+            if (!saved || typeof saved !== 'object') return;
+            Object.keys(state.features).forEach(f => {
+                if (typeof saved[f] !== 'boolean') return;
+                state.features[f] = saved[f];
+                const activeBox = document.querySelector(`[data-feature="${f}"][data-mode="active"]`);
+                const bypassBox = document.querySelector(`[data-feature="${f}"][data-mode="bypass"]`);
+                if (activeBox) activeBox.checked = saved[f];
+                if (bypassBox) bypassBox.checked = !saved[f];
+            });
+            state.noiseCancellation.enabled = state.features.denoise;
+            const denoiseLabel = document.getElementById('denoise-toggle-label');
+            if (denoiseLabel) denoiseLabel.textContent = state.features.denoise ? 'Active' : 'Bypassed';
+            // Keep the separately stored balance flag in agreement with the restored toggle.
+            if (typeof balanceHasApplied !== 'undefined' && balanceHasApplied && typeof persistBalance === 'function') {
+                persistBalance(state.features.balance);
+            }
+        }
+
         // Active / Bypass controls are mutually exclusive for each processing stage.
         document.querySelectorAll('[data-feature-controls]').forEach(group => {
             group.querySelectorAll('input[type="checkbox"]').forEach(input => {
@@ -750,6 +792,7 @@
                         const enabled = state.features.balance;
                         if (typeof persistBalance === 'function') persistBalance(enabled);
                     }
+                    saveFeatureToggles();
                     showToast(`${feature.charAt(0).toUpperCase() + feature.slice(1)} ${state.features[feature] ? 'active' : 'bypassed'}.`);
                     updateUI();
                 });
@@ -1279,12 +1322,20 @@
                 item.draggable = true;
                 item.dataset.trackId = track.id;
 
+                let handlePressed = false;
                 item.addEventListener('dragstart', (e) => {
+                    // The burger handle uses its own pointer-based reorder (works on touch too).
+                    if (handlePressed) { e.preventDefault(); return; }
                     e.dataTransfer.setData('text/plain', track.id);
                 });
 
                 item.innerHTML = `
                     <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0 flex-1">
+                        ${sideKey !== 'pool' ? `
+                            <span class="drag-handle text-stone-500 hover:text-amber-400 px-1.5 py-1.5 -ml-1 flex-shrink-0" title="Drag to reorder" aria-label="Drag to reorder" role="button">
+                                <i class="fa-solid fa-bars"></i>
+                            </span>
+                        ` : ''}
                         <button class="play-single-btn text-stone-400 hover:text-amber-400 p-1 transition flex-shrink-0 active:scale-95" title="Preview track" aria-label="Play track">
                             <i class="fa-solid ${state.isPlaying && state.activeSide === sideKey && state.playingIndex === idx ? 'fa-pause text-amber-500' : 'fa-play'}"></i>
                         </button>
@@ -1320,6 +1371,10 @@
                 });
 
                 if (sideKey !== 'pool') {
+                    const handle = item.querySelector('.drag-handle');
+                    handle.addEventListener('mousedown', () => { handlePressed = true; });
+                    document.addEventListener('mouseup', () => { handlePressed = false; }, { once: true });
+                    handle.addEventListener('pointerdown', (e) => startHandleReorder(e, item, handle));
                     item.querySelector('.move-pool-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         track.side = 'pool';
@@ -1349,6 +1404,94 @@
 
                 container.appendChild(item);
             });
+        }
+
+        // Drag-to-reorder using the burger handle. Works with mouse and touch,
+        // within a side or across Side A <-> Side B.
+        function startHandleReorder(e, item, handle) {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const lists = [sideAList, sideBList];
+            try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+            item.classList.add('track-dragging');
+            document.body.classList.add('reordering');
+
+            function onMove(ev) {
+                const x = ev.clientX, y = ev.clientY;
+                let target = null;
+                for (const list of lists) {
+                    const r = list.getBoundingClientRect();
+                    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) { target = list; break; }
+                }
+                if (!target) return;
+
+                const prompt = target.querySelector('.empty-prompt');
+                if (prompt) prompt.remove();
+
+                const siblings = Array.from(target.children).filter(c => c !== item && c.dataset && c.dataset.trackId);
+                let before = null;
+                for (const sib of siblings) {
+                    const r = sib.getBoundingClientRect();
+                    if (y < r.top + r.height / 2) { before = sib; break; }
+                }
+                if (before) {
+                    if (item.parentNode !== target || item.nextElementSibling !== before) target.insertBefore(item, before);
+                } else if (item.parentNode !== target || target.lastElementChild !== item) {
+                    target.appendChild(item);
+                }
+
+                const tr = target.getBoundingClientRect();
+                if (y < tr.top + 28) target.scrollTop -= 10;
+                else if (y > tr.bottom - 28) target.scrollTop += 10;
+            }
+
+            function finish() {
+                handle.removeEventListener('pointermove', onMove);
+                handle.removeEventListener('pointerup', finish);
+                handle.removeEventListener('pointercancel', finish);
+                try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+                document.body.classList.remove('reordering');
+                item.classList.remove('track-dragging');
+                commitReorderFromDOM();
+            }
+
+            handle.addEventListener('pointermove', onMove);
+            handle.addEventListener('pointerup', finish);
+            handle.addEventListener('pointercancel', finish);
+        }
+
+        function commitReorderFromDOM() {
+            const idsIn = list => Array.from(list.querySelectorAll('[data-track-id]')).map(el => el.dataset.trackId);
+            const byId = new Map(state.tracks.map(t => [t.id, t]));
+
+            // Remember what is playing so the deck keeps following the right track.
+            let playingId = null;
+            if (state.isPlaying) {
+                const current = state.tracks.filter(t => t.side === state.activeSide)[state.playingIndex];
+                playingId = current ? current.id : null;
+            }
+
+            const idsA = idsIn(sideAList);
+            const idsB = idsIn(sideBList);
+            const used = new Set([...idsA, ...idsB]);
+            const newTracks = [];
+            idsA.forEach(id => { const t = byId.get(id); if (t) { t.side = 'A'; newTracks.push(t); } });
+            idsB.forEach(id => { const t = byId.get(id); if (t) { t.side = 'B'; newTracks.push(t); } });
+            state.tracks.forEach(t => { if (!used.has(t.id)) newTracks.push(t); });
+            state.tracks = newTracks;
+
+            if (playingId) {
+                const newIdx = state.tracks.filter(t => t.side === state.activeSide).findIndex(t => t.id === playingId);
+                if (newIdx === -1) {
+                    stopPlayback();
+                } else {
+                    state.playingIndex = newIdx;
+                    deckStatusLabel.textContent = `Playing Side ${state.activeSide} [Trk ${newIdx + 1}]`;
+                }
+            }
+            updateUI();
         }
 
         async function processAudioFiles(files) {
@@ -2410,6 +2553,7 @@
         const defaultProfile = createSyntheticNoiseProfile('60hz_us');
         setLoadedNoiseProfile(defaultProfile);
 
+        restoreFeatureToggles();
         updateUI();
     </script>
 </body>
