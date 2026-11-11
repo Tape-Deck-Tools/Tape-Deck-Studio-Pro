@@ -326,7 +326,7 @@
                     </div>
                     <div>
                         <h2 class="text-sm sm:text-base font-bold uppercase tracking-wider text-amber-400">Tape Deck Settings</h2>
-                        <p class="text-xs text-stone-400">Manage speed, noise reduction, formulations, and level calibrations.</p>
+                        <p class="text-xs text-stone-400">Each processing stage can be switched between Active and Bypass independently.</p>
                     </div>
                 </div>
 
@@ -376,7 +376,10 @@
 
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-semibold text-stone-400">Inter-Track Silent Gap</label>
+                                <div class="flex items-center justify-between gap-2"><label class="text-xs font-semibold text-stone-400">Inter-Track Silent Gap</label><div class="flex items-center gap-2 text-[10px] font-semibold shrink-0" data-feature-controls="gap">
+        <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="checkbox" class="feature-active accent-emerald-500" data-feature="gap" data-mode="active" checked> Active</label>
+        <label class="flex items-center gap-1 text-stone-400 cursor-pointer"><input type="checkbox" class="feature-bypass accent-amber-500" data-feature="gap" data-mode="bypass" > Bypass</label>
+    </div></div>
                                 <span id="gap-val-display" class="text-xs font-mono text-amber-400">2.0s</span>
                             </div>
                             <input type="range" id="gap-slider" min="0" max="10" step="0.5" value="2.0" class="w-full accent-amber-500 bg-stone-800 rounded py-1 cursor-pointer">
@@ -389,7 +392,10 @@
                             <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center">
                                 <i class="fa-solid fa-gauge-high mr-2"></i> Hardware Speed Adjustment
                             </h3>
-                            <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                            <div class="flex items-center gap-2 text-[10px] font-semibold shrink-0" data-feature-controls="speed">
+        <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="checkbox" class="feature-active accent-emerald-500" data-feature="speed" data-mode="active" checked> Active</label>
+        <label class="flex items-center gap-1 text-stone-400 cursor-pointer"><input type="checkbox" class="feature-bypass accent-amber-500" data-feature="speed" data-mode="bypass" > Bypass</label>
+    </div><span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">
                                 Pitch & Timing
                             </span>
                         </div>
@@ -444,10 +450,10 @@
                                 Subtracts tape hiss & hum using your cassette silence sample
                             </p>
                         </div>
-                        <label class="flex items-center space-x-2 cursor-pointer bg-stone-950 px-2.5 py-1.5 rounded-lg border border-stone-800 hover:border-stone-700 flex-shrink-0 self-end sm:self-auto">
-                            <input type="checkbox" id="denoise-enabled" class="accent-amber-500 w-4 h-4 cursor-pointer" checked>
-                            <span class="text-xs font-bold text-stone-200" id="denoise-toggle-label">Active</span>
-                        </label>
+                        <div class="flex items-center gap-2 bg-stone-950 px-2.5 py-1.5 rounded-lg border border-stone-800 flex-shrink-0 self-end sm:self-auto" data-feature-controls="denoise">
+                            <label class="flex items-center gap-1 text-emerald-400 text-[10px] font-semibold cursor-pointer"><input type="checkbox" id="denoise-enabled" class="accent-emerald-500 w-4 h-4 cursor-pointer feature-active" data-feature="denoise" data-mode="active" checked> Active</label>
+                            <label class="flex items-center gap-1 text-stone-400 text-[10px] font-semibold cursor-pointer"><input type="checkbox" class="accent-amber-500 w-4 h-4 cursor-pointer feature-bypass" data-feature="denoise" data-mode="bypass"> Bypass</label>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -611,6 +617,10 @@
                     
                     <!-- Formulation -->
                     <div class="space-y-2 bg-stone-950/40 p-4 rounded-xl border border-stone-800/80">
+                        <div class="flex justify-end"><div class="flex items-center gap-2 text-[10px] font-semibold shrink-0" data-feature-controls="formulation">
+        <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="checkbox" class="feature-active accent-emerald-500" data-feature="formulation" data-mode="active" checked> Active</label>
+        <label class="flex items-center gap-1 text-stone-400 cursor-pointer"><input type="checkbox" class="feature-bypass accent-amber-500" data-feature="formulation" data-mode="bypass" > Bypass</label>
+    </div></div>
                         <label class="block text-xs font-bold text-amber-300 mb-1 flex items-center">
                             <i class="fa-solid fa-compact-disc mr-1.5 text-amber-500"></i>
                             Tape Formulation / Bias Type
@@ -627,6 +637,10 @@
 
                     <!-- DSP Pre-Emphasis -->
                     <div class="space-y-2 bg-stone-950/40 p-4 rounded-xl border border-stone-800/80">
+                        <div class="flex justify-end"><div class="flex items-center gap-2 text-[10px] font-semibold shrink-0" data-feature-controls="dsp">
+        <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="checkbox" class="feature-active accent-emerald-500" data-feature="dsp" data-mode="active" checked> Active</label>
+        <label class="flex items-center gap-1 text-stone-400 cursor-pointer"><input type="checkbox" class="feature-bypass accent-amber-500" data-feature="dsp" data-mode="bypass" > Bypass</label>
+    </div></div>
                         <label class="block text-xs font-bold text-amber-300 mb-1 flex items-center">
                             <i class="fa-solid fa-wave-square mr-1.5 text-amber-500"></i>
                             DSP Pre-Emphasis Profile
@@ -650,10 +664,10 @@
                 <div class="p-4 rounded-xl border border-amber-500/25 bg-stone-950/70 space-y-3">
                     <div class="flex items-center justify-between gap-3 flex-wrap">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400">Stereo Balance Compensation</h3>
-                        <label class="flex items-center gap-2 text-[11px] text-stone-300 cursor-pointer">
-                            <input id="balance-enabled" type="checkbox" class="accent-amber-500" checked>
-                            Enable Calibration
-                        </label>
+                        <div class="flex items-center gap-2" data-feature-controls="balance">
+                            <label class="flex items-center gap-1 text-emerald-400 text-[10px] font-semibold cursor-pointer"><input id="balance-enabled" type="checkbox" class="accent-emerald-500 feature-active" data-feature="balance" data-mode="active" checked> Active</label>
+                            <label class="flex items-center gap-1 text-stone-400 text-[10px] font-semibold cursor-pointer"><input type="checkbox" class="accent-amber-500 feature-bypass" data-feature="balance" data-mode="bypass"> Bypass</label>
+                        </div>
                     </div>
                     <p class="text-[11px] leading-relaxed text-stone-400">Paste the correction copied from Tape Deck Calibration. Adjusts Left & Right gain during WAV export only.</p>
                     
@@ -695,6 +709,7 @@
             speedPercent: -5.75,
             dspProfile: 'modern',
             tapeFormulation: 'type1',
+            features: { gap: true, speed: true, denoise: true, formulation: true, dsp: true, balance: true },
             tracks: [],
             activeSide: 'A',
             playingIndex: -1,
@@ -709,6 +724,37 @@
                 humNotchEnabled: true
             }
         };
+
+        // Active / Bypass controls are mutually exclusive for each processing stage.
+        document.querySelectorAll('[data-feature-controls]').forEach(group => {
+            group.querySelectorAll('input[type="checkbox"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    const feature = input.dataset.feature;
+                    const isActive = input.dataset.mode === 'active';
+                    if (input.checked) {
+                        group.querySelectorAll('input[type="checkbox"]').forEach(other => {
+                            if (other !== input) other.checked = false;
+                        });
+                        state.features[feature] = isActive;
+                    } else {
+                        // Keep one explicit mode selected at all times.
+                        input.checked = true;
+                        return;
+                    }
+                    if (feature === 'denoise') {
+                        state.noiseCancellation.enabled = state.features.denoise;
+                        const label = document.getElementById('denoise-toggle-label');
+                        if (label) label.textContent = state.features.denoise ? 'Active' : 'Bypassed';
+                    }
+                    if (feature === 'balance') {
+                        const enabled = state.features.balance;
+                        if (typeof persistBalance === 'function') persistBalance(enabled);
+                    }
+                    showToast(`${feature.charAt(0).toUpperCase() + feature.slice(1)} ${state.features[feature] ? 'active' : 'bypassed'}.`);
+                    updateUI();
+                });
+            });
+        });
 
         // Tab Switching Handler for "Tape Deck Settings"
         document.querySelectorAll('.setting-tab-btn').forEach(btn => {
@@ -1162,7 +1208,7 @@
         function calculateSideDuration(trackList) {
             if (trackList.length === 0) return 0;
             const trackSum = trackList.reduce((acc, t) => acc + t.duration, 0);
-            const gapsSum = (trackList.length - 1) * state.gapSeconds;
+            const gapsSum = (trackList.length - 1) * (state.features.gap ? state.gapSeconds : 0);
             return trackSum + gapsSum;
         }
 
@@ -1208,8 +1254,9 @@
             renderTrackList(sideBList, sideBTracks, 'B');
             renderTrackList(poolList, poolTracks, 'pool');
 
-            const rate = 1 + (state.speedPercent / 100);
-            speedIndicatorBadge.textContent = `${state.speedPercent >= 0 ? '+' : ''}${state.speedPercent.toFixed(2)}% (${rate.toFixed(3)}x)`;
+            const effectiveSpeed = state.features.speed ? state.speedPercent : 0;
+            const rate = 1 + (effectiveSpeed / 100);
+            speedIndicatorBadge.textContent = state.features.speed ? `${state.speedPercent >= 0 ? '+' : ''}${state.speedPercent.toFixed(2)}% (${rate.toFixed(3)}x)` : `BYPASS (1.000x)`;
         }
 
         function renderTrackList(container, trackList, sideKey) {
@@ -1387,8 +1434,8 @@
             let currentDurB = 0;
 
             sorted.forEach(track => {
-                const costA = currentDurA === 0 ? track.duration : track.duration + state.gapSeconds;
-                const costB = currentDurB === 0 ? track.duration : track.duration + state.gapSeconds;
+                const costA = currentDurA === 0 ? track.duration : track.duration + (state.features.gap ? state.gapSeconds : 0);
+                const costB = currentDurB === 0 ? track.duration : track.duration + (state.features.gap ? state.gapSeconds : 0);
 
                 if (currentDurA + costA <= capA && (currentDurA <= currentDurB || currentDurB + costB > capB)) {
                     track.side = 'A';
@@ -1594,7 +1641,7 @@
             currentSourceNode = audioCtx.createBufferSource();
             currentSourceNode.buffer = track.buffer;
 
-            const rate = 1 + (state.speedPercent / 100);
+            const rate = 1 + ((state.features.speed ? state.speedPercent : 0) / 100);
             currentSourceNode.playbackRate.value = Math.max(0.1, rate);
 
             currentSourceNode.connect(analyserNode);
@@ -1607,7 +1654,7 @@
                 if (state.isPlaying) {
                     setTimeout(() => {
                         if (state.isPlaying) playTrackAtIndex(state.playingIndex + 1);
-                    }, state.gapSeconds * 1000);
+                    }, (state.features.gap ? state.gapSeconds : 0) * 1000);
                 }
             };
 
@@ -1676,7 +1723,7 @@
 
             function draw() {
                 if (!state.isPlaying) return;
-                const elapsed = (audioCtx.currentTime - playStartTime) * (1 + state.speedPercent / 100);
+                const elapsed = (audioCtx.currentTime - playStartTime) * (1 + ((state.features.speed ? state.speedPercent : 0) / 100));
                 deckTimer.textContent = formatTime(elapsed);
 
                 analyserNode.getByteFrequencyData(dataArray);
@@ -1768,6 +1815,8 @@
                     balanceHasApplied = true;
                     document.getElementById('balance-setting').value = saved.raw || `BALANCE_V1|L=${saved.left}|R=${saved.right}`;
                     document.getElementById('balance-enabled').checked = saved.enabled !== false;
+                    state.features.balance = saved.enabled !== false;
+                    document.querySelector('[data-feature="balance"][data-mode="bypass"]').checked = saved.enabled === false;
                     updateBalanceStatus(`Loaded · Left ${saved.left >= 0 ? '+' : ''}${saved.left.toFixed(2)} dB / Right ${saved.right >= 0 ? '+' : ''}${saved.right.toFixed(2)} dB${saved.enabled === false ? ' · disabled' : ' · active on export'}`, true);
                 }
             } catch (_) {}
@@ -1823,6 +1872,8 @@
             document.getElementById('balance-setting').value = '';
             document.getElementById('balance-update-setting').value = '';
             document.getElementById('balance-enabled').checked = true;
+            state.features.balance = true;
+            document.querySelector('[data-feature="balance"][data-mode="bypass"]').checked = false;
             try { localStorage.removeItem(BALANCE_STORAGE_KEY); } catch (_) {}
             updateBalanceStatus('Calibration cleared. No channel compensation will be applied.');
         });
@@ -1837,7 +1888,7 @@
             const trimNode = offlineCtx.createGain();
             trimNode.gain.value = 0.707;
 
-            switch (state.dspProfile) {
+            switch (state.features.dsp ? state.dspProfile : 'none') {
                 case 'modern':
                     profilePrefix = "MODERN";
                     const f1 = offlineCtx.createBiquadFilter();
@@ -1870,7 +1921,7 @@
             const formulationGain = offlineCtx.createGain();
             let formulationTag = "TYPE1";
 
-            switch (state.tapeFormulation) {
+            switch (state.features.formulation ? state.tapeFormulation : 'bypass') {
                 case 'type2':
                     formulationTag = "TYPE2-CHROME";
                     formulationFilter.type = 'highshelf';
@@ -1884,6 +1935,13 @@
                     formulationFilter.frequency.value = 10000;
                     formulationFilter.gain.value = 1.0;
                     formulationGain.gain.value = 0.85;
+                    break;
+                case 'bypass':
+                    formulationTag = "FORMULATION-BYPASS";
+                    formulationFilter.type = 'allpass';
+                    formulationFilter.frequency.value = 1000;
+                    formulationFilter.Q.value = 0.0001;
+                    formulationGain.gain.value = 1.0;
                     break;
                 default:
                     formulationTag = "TYPE1-FERRIC";
@@ -1914,14 +1972,16 @@
 
             showToast(`Rendering Side ${side} WAV (${state.dspProfile.toUpperCase()}, ${state.tapeFormulation.toUpperCase()})...`);
 
-            const rate = Math.max(0.1, 1 + (state.speedPercent / 100));
+            const effectiveSpeedPercent = state.features.speed ? state.speedPercent : 0;
+            const effectiveGapSeconds = state.features.gap ? state.gapSeconds : 0;
+            const rate = Math.max(0.1, 1 + (effectiveSpeedPercent / 100));
             const nativeSampleRate = activeTracks[0].buffer.sampleRate || 44100;
             const safetyTailSeconds = 1.0;
 
             const processedTracks = [];
             for (let i = 0; i < activeTracks.length; i++) {
                 const track = activeTracks[i];
-                if (state.noiseCancellation && state.noiseCancellation.enabled && state.noiseCancellation.profile) {
+                if (state.features.denoise && state.noiseCancellation && state.noiseCancellation.enabled && state.noiseCancellation.profile) {
                     showToast(`Noise Cancellation: cleaning ${track.name} [${i + 1}/${activeTracks.length}]...`);
                     const cleanedBuffer = applySpectralDenoise(audioCtx, track.buffer, state.noiseCancellation.profile, state.noiseCancellation);
                     processedTracks.push({ ...track, buffer: cleanedBuffer });
@@ -1938,7 +1998,7 @@
                 const sourceDuration = (track.buffer.duration * resampleRatio) / rate;
                 trackStartTimes.push({ track, startTime: currentTimeOffset, sourceDuration });
                 currentTimeOffset += sourceDuration;
-                if (i < processedTracks.length - 1) currentTimeOffset += Math.max(0, state.gapSeconds);
+                if (i < processedTracks.length - 1) currentTimeOffset += Math.max(0, effectiveGapSeconds);
             });
 
             const totalRenderDuration = currentTimeOffset + safetyTailSeconds;
@@ -1954,7 +2014,7 @@
                 limiter.attack.value = 0.005;
                 limiter.release.value = 0.08;
 
-                const balanceEnabled = document.getElementById('balance-enabled').checked;
+                const balanceEnabled = state.features.balance && document.getElementById('balance-enabled').checked;
                 if (balanceEnabled && (balanceCorrectionDb.left !== 0 || balanceCorrectionDb.right !== 0)) {
                     const splitter = offlineCtx.createChannelSplitter(2);
                     const merger = offlineCtx.createChannelMerger(2);
@@ -1986,10 +2046,10 @@
                 const url = URL.createObjectURL(wavBlob);
                 const a = document.createElement('a');
 
-                const speedSign = state.speedPercent >= 0 ? '+' : '';
-                const noiseTag = (state.noiseCancellation && state.noiseCancellation.enabled && state.noiseCancellation.profile) ? '_DENOISED' : '';
+                const speedSign = effectiveSpeedPercent >= 0 ? '+' : '';
+                const noiseTag = (state.features.denoise && state.noiseCancellation && state.noiseCancellation.enabled && state.noiseCancellation.profile) ? '_DENOISED' : '';
                 a.href = url;
-                a.download = `${fullPrefix}${noiseTag}_Side_${side}_${speedSign}${state.speedPercent.toFixed(2)}pct.wav`;
+                a.download = `${fullPrefix}${noiseTag}_Side_${side}_${speedSign}${effectiveSpeedPercent.toFixed(2)}pct.wav`;
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
@@ -2256,6 +2316,9 @@
         if (denoiseEnabledCheck) {
             denoiseEnabledCheck.addEventListener('change', (e) => {
                 state.noiseCancellation.enabled = e.target.checked;
+                state.features.denoise = e.target.checked;
+                const bypassBox = document.querySelector('[data-feature="denoise"][data-mode="bypass"]');
+                if (bypassBox) bypassBox.checked = !e.target.checked;
                 denoiseToggleLabel.textContent = e.target.checked ? "Active" : "Bypassed";
                 showToast(`Noise Cancellation ${e.target.checked ? "activated" : "bypassed"}.`);
             });
