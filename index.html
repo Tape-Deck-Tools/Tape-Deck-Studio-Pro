@@ -68,14 +68,34 @@
             cursor: grab;
             user-select: none;
             -webkit-user-select: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-width: 48px;
+            min-height: 34px;
+            padding: 5px 8px;
+            flex-shrink: 0;
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.38);
+            border-radius: 7px;
+            cursor: grab;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .04em;
         }
+        .drag-handle:hover { background: rgba(245, 158, 11, 0.22); border-color: #f59e0b; }
         .drag-handle:active { cursor: grabbing; }
+        .track-drop-before { box-shadow: inset 0 3px 0 #f59e0b !important; }
+        .track-drop-after { box-shadow: inset 0 -3px 0 #f59e0b !important; }
+        .track-dragging { position: relative; z-index: 5; }
         body.reordering, body.reordering * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
         .track-dragging {
-            opacity: 0.85;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.55);
-            border-color: #f59e0b !important;
-            background-color: rgba(245,158,11,0.12) !important;
+            opacity: 0.92;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.65);
+            border: 1px solid #f59e0b !important;
+            background-color: rgba(245,158,11,0.16) !important;
         }
         button:disabled {
             opacity: 0.55;
@@ -240,6 +260,11 @@
                                 <span>Export Side B</span>
                             </button>
                         </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-[10px] sm:text-[11px] text-amber-200/90">
+                        <i class="fa-solid fa-up-down-left-right text-amber-400"></i>
+                        <span><strong>Reorder tracks:</strong> grab the amber <strong>DRAG</strong> handle and move it up or down to any position. You can also drag tracks between Side A and Side B.</span>
                     </div>
 
                     <!-- Side Panels Stacked via Grid to prevent Reflow Jitter -->
@@ -1319,21 +1344,16 @@
                         ? 'border-amber-500 bg-amber-500/10'
                         : 'border-stone-800'
                 }`;
-                item.draggable = true;
+                // Reordering is handled by the pointer-based handle below. Disable
+                // native HTML dragging so it cannot steal mouse/touch movement.
+                item.draggable = false;
                 item.dataset.trackId = track.id;
-
-                let handlePressed = false;
-                item.addEventListener('dragstart', (e) => {
-                    // The burger handle uses its own pointer-based reorder (works on touch too).
-                    if (handlePressed) { e.preventDefault(); return; }
-                    e.dataTransfer.setData('text/plain', track.id);
-                });
 
                 item.innerHTML = `
                     <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0 flex-1">
                         ${sideKey !== 'pool' ? `
-                            <span class="drag-handle text-stone-500 hover:text-amber-400 px-1.5 py-1.5 -ml-1 flex-shrink-0" title="Drag to reorder" aria-label="Drag to reorder" role="button">
-                                <i class="fa-solid fa-bars"></i>
+                            <span class="drag-handle" title="Click and hold, then move up or down to reorder" aria-label="Drag to reorder" role="button" tabindex="0">
+                                <i class="fa-solid fa-grip-vertical"></i><span>DRAG</span>
                             </span>
                         ` : ''}
                         <button class="play-single-btn text-stone-400 hover:text-amber-400 p-1 transition flex-shrink-0 active:scale-95" title="Preview track" aria-label="Play track">
@@ -1372,9 +1392,13 @@
 
                 if (sideKey !== 'pool') {
                     const handle = item.querySelector('.drag-handle');
-                    handle.addEventListener('mousedown', () => { handlePressed = true; });
-                    document.addEventListener('mouseup', () => { handlePressed = false; }, { once: true });
                     handle.addEventListener('pointerdown', (e) => startHandleReorder(e, item, handle));
+                    handle.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            moveTrackByKeyboard(track.id, sideKey, e.key === 'ArrowUp' ? -1 : 1);
+                        }
+                    });
                     item.querySelector('.move-pool-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         track.side = 'pool';
@@ -1406,60 +1430,107 @@
             });
         }
 
-        // Drag-to-reorder using the burger handle. Works with mouse and touch,
-        // within a side or across Side A <-> Side B.
+        // Pointer-driven reordering. Listen on document rather than the handle:
+        // pointer capture + moving the dragged node can otherwise make movement
+        // appear to stop after crossing the first row.
         function startHandleReorder(e, item, handle) {
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             e.preventDefault();
             e.stopPropagation();
 
             const lists = [sideAList, sideBList];
-            try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+            const pointerId = e.pointerId;
+            let moved = false;
+            let lastTarget = null;
+            let lastBefore = null;
+
             item.classList.add('track-dragging');
             document.body.classList.add('reordering');
 
-            function onMove(ev) {
-                const x = ev.clientX, y = ev.clientY;
-                let target = null;
-                for (const list of lists) {
-                    const r = list.getBoundingClientRect();
-                    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) { target = list; break; }
-                }
-                if (!target) return;
-
-                const prompt = target.querySelector('.empty-prompt');
-                if (prompt) prompt.remove();
-
-                const siblings = Array.from(target.children).filter(c => c !== item && c.dataset && c.dataset.trackId);
-                let before = null;
-                for (const sib of siblings) {
-                    const r = sib.getBoundingClientRect();
-                    if (y < r.top + r.height / 2) { before = sib; break; }
-                }
-                if (before) {
-                    if (item.parentNode !== target || item.nextElementSibling !== before) target.insertBefore(item, before);
-                } else if (item.parentNode !== target || target.lastElementChild !== item) {
-                    target.appendChild(item);
-                }
-
-                const tr = target.getBoundingClientRect();
-                if (y < tr.top + 28) target.scrollTop -= 10;
-                else if (y > tr.bottom - 28) target.scrollTop += 10;
+            // Capture is deliberately avoided; document-level listeners keep
+            // receiving movement while the dragged item is reinserted elsewhere.
+            function clearDropMarkers() {
+                document.querySelectorAll('.track-drop-before, .track-drop-after').forEach(el => {
+                    el.classList.remove('track-drop-before', 'track-drop-after');
+                });
             }
 
-            function finish() {
-                handle.removeEventListener('pointermove', onMove);
-                handle.removeEventListener('pointerup', finish);
-                handle.removeEventListener('pointercancel', finish);
-                try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+            function onMove(ev) {
+                if (ev.pointerId !== pointerId) return;
+                ev.preventDefault();
+
+                const x = ev.clientX;
+                const y = ev.clientY;
+                const target = lists.find(list => {
+                    const r = list.getBoundingClientRect();
+                    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+                });
+                if (!target) {
+                    clearDropMarkers();
+                    lastTarget = null;
+                    lastBefore = null;
+                    return;
+                }
+
+                const siblings = Array.from(target.children).filter(el =>
+                    el !== item && el.dataset && el.dataset.trackId
+                );
+
+                let before = null;
+                let after = null;
+                for (const sibling of siblings) {
+                    const r = sibling.getBoundingClientRect();
+                    if (y < r.top + r.height / 2) {
+                        before = sibling;
+                        break;
+                    }
+                    after = sibling;
+                }
+
+                clearDropMarkers();
+                if (before) before.classList.add('track-drop-before');
+                else if (after) after.classList.add('track-drop-after');
+
+                // Only mutate the DOM when the insertion point actually changes.
+                if (target !== lastTarget || before !== lastBefore || item.parentNode !== target) {
+                    if (before) target.insertBefore(item, before);
+                    else target.appendChild(item);
+                    moved = true;
+                    lastTarget = target;
+                    lastBefore = before;
+                }
+
+                const rect = target.getBoundingClientRect();
+                if (y < rect.top + 30) target.scrollTop -= 12;
+                else if (y > rect.bottom - 30) target.scrollTop += 12;
+            }
+
+            function finish(ev) {
+                if (ev && ev.pointerId !== undefined && ev.pointerId !== pointerId) return;
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', finish);
+                document.removeEventListener('pointercancel', finish);
+                clearDropMarkers();
                 document.body.classList.remove('reordering');
                 item.classList.remove('track-dragging');
-                commitReorderFromDOM();
+
+                if (moved) commitReorderFromDOM();
             }
 
-            handle.addEventListener('pointermove', onMove);
-            handle.addEventListener('pointerup', finish);
-            handle.addEventListener('pointercancel', finish);
+            document.addEventListener('pointermove', onMove, { passive: false });
+            document.addEventListener('pointerup', finish);
+            document.addEventListener('pointercancel', finish);
+        }
+
+        function moveTrackByKeyboard(trackId, sideKey, direction) {
+            const list = sideKey === 'A' ? sideAList : sideBList;
+            const items = Array.from(list.querySelectorAll('[data-track-id]'));
+            const index = items.findIndex(el => el.dataset.trackId === trackId);
+            const nextIndex = index + direction;
+            if (index < 0 || nextIndex < 0 || nextIndex >= items.length) return;
+            if (direction < 0) list.insertBefore(items[index], items[nextIndex]);
+            else list.insertBefore(items[nextIndex], items[index]);
+            commitReorderFromDOM();
         }
 
         function commitReorderFromDOM() {
