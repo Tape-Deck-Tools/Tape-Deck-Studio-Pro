@@ -337,14 +337,18 @@
 
         <!-- ROW 2: Unassigned Track Pool (Middle Row) -->
         <div class="w-full bg-stone-900 border border-stone-800 rounded-xl p-4 shadow-xl">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex flex-wrap items-center justify-between mb-3 gap-2">
                 <div class="flex items-center space-x-2">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">Unassigned Track Pool</h3>
                     <span id="pool-count" class="px-2 py-0.5 bg-stone-800 text-stone-300 text-[11px] rounded font-mono">0</span>
                 </div>
-                <span class="text-[10px] sm:text-[11px] text-stone-500">
-                    Original Lengths
-                </span>
+                <div class="flex items-center gap-3">
+                    <span class="text-[10px] sm:text-[11px] text-stone-500">Original Lengths</span>
+                    <button id="btn-return-all-pool" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 text-[10px] sm:text-[11px] font-bold transition active:scale-95" title="Move all Side A and Side B tracks back to the unassigned pool">
+                        <i class="fa-solid fa-arrow-rotate-left"></i>
+                        <span>Return All to Unassigned</span>
+                    </button>
+                </div>
             </div>
 
             <div id="unassigned-pool" class="min-h-[90px] max-h-[160px] overflow-y-auto p-2 bg-stone-950/50 border border-stone-800/80 rounded-lg space-y-2">
@@ -2095,6 +2099,25 @@
 
         document.getElementById('btn-export-side-a').addEventListener('click', () => exportSideWav('A'));
         document.getElementById('btn-export-side-b').addEventListener('click', () => exportSideWav('B'));
+
+        document.getElementById('btn-return-all-pool').addEventListener('click', () => {
+            const assignedTracks = state.tracks.filter(track => track.side === 'A' || track.side === 'B');
+            if (assignedTracks.length === 0) {
+                showToast('There are no assigned tracks to return.');
+                return;
+            }
+
+            // Stop playback before changing the active side's track list.
+            if (state.isPlaying || currentSourceNode || state.playingIndex >= 0) {
+                stopPlayback();
+            }
+
+            // state.tracks retains the original load order, so changing each
+            // track's side restores that order in the unassigned pool.
+            assignedTracks.forEach(track => { track.side = 'pool'; });
+            updateUI();
+            showToast(`${assignedTracks.length} track(s) returned to the Unassigned Pool.`);
+        });
 
         function setupAudioPipeline(offlineCtx) {
             let entryNode = null, exitNode = null, profilePrefix = "STANDARD";
